@@ -1,0 +1,25 @@
+
+html, body {
+    margin: 0;
+    height: 100%;
+}
+
+body {
+	background-color: #EBEBE0;
+}
+
+.content-body {
+	margin-left: 5%;
+	margin-right: 5%;
+	
+}
+
+.whole-page {
+	height: 100%;
+	width: 100%;
+	background-color: #EBEBE0;
+}
+
+.tab {
+	margin: 1%;
+}

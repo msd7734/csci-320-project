@@ -1,0 +1,148 @@
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html">
+<h:head>
+	<meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+	
+	<title>Steam Searcher</title>
+	
+    <link href="css/bootstrap.css" rel="stylesheet"/>
+	<link href="css/bootstrap-theme.css" rel="stylesheet"/>
+	
+	<link href="Steam.css" rel="stylesheet"/>
+	
+</h:head>
+<body>
+	<div class="whole-page">
+	<div class="content-body">
+	  <h1>Steam Searcher</h1>
+		<div class="panel panel-default">
+		  <div class="panel-body">
+			<ul class="nav nav-pills" role="tablist">
+			  <li><a href="index.xhtml">Profile</a></li>
+			  <li class="active"><a href="#">Games</a></li>
+			  <li><a href="Users.xhtml">Users</a></li>
+			</ul>
+			<hr/>
+			<div class="tab">
+				<h2>Game Search:</h2>
+				<div class="panel panel-default">
+		  			<div class="panel-body">
+		  				<form>
+			  				<div class="row">
+								<div class="col-xs-12 col-sm-6 col-md-6">
+									<div class="form-group">
+										<label for="title">Game Title:</label>
+										<input type="text" name="title" id="title" class="form-control input-lg" tabindex="1"/>
+									</div>
+								</div>
+								<div class="col-xs-12 col-sm-6 col-md-6">
+									<div class="form-group">
+										<label for="genre">Genre:</label>
+										<input list="genre" class="form-control input-lg" name="state" tabindex="2"/>
+										<datalist id="genre">
+										<option value="Action"/>
+										<option value="Adventure"/>
+										<option value="RPG"/>
+										<option value="MMORPG"/>
+										<option value="Platformer"/>
+										<option value="Fighting"/>
+										<option value="FPS"/>
+										</datalist>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-12 col-sm-6 col-md-6">
+									<div class="form-group">
+										<label for="studio">Game Studio:</label>
+										<input type="text" name="studio" id="studio" class="form-control input-lg" tabindex="3"/>
+									</div>
+								</div>
+								<div class="col-xs-12 col-sm-6 col-md-6">
+									<div class="form-group">
+										<label for="owners">Minimum number of owners:</label>
+										<input type="text" name="owners" id="owners" class="form-control input-lg" tabindex="4"/>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-12 col-sm-6 col-md-6">
+									<div class="form-group">
+										<label>Options:</label><br/>
+										<input type="checkbox"/> Use Friendslist<br/>
+										<input type="checkbox"/> Similar to Library<br/>
+									</div>
+								</div>
+								<div class="col-xs-12 col-sm-6 col-md-6">
+									<div class="form-group">
+										<label for="sort">Sort by:</label>
+										<input list="sort" class="form-control input-lg" name="state" tabindex="2"/>
+										<datalist id="sort">
+										<option value="Alphabetical"/>
+										<option value="Community Playtime"/>
+										<option value="Genre"/>
+										</datalist>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-12 col-sm-6 col-md-6">
+									<button type='button' class='btn btn-sm btn-default'>Search</button>
+								</div>
+							</div>
+		  				</form>
+		  			</div>
+		  		</div>
+		  		<div>
+		  			<h2>Results:</h2>
+		  			<hr/>
+		  			<table class="table">
+						<thead>
+							<tr class="filters">
+								<th>#</th>
+								<th>Game Title</th>
+								<th>Studio</th>
+								<th>Genre</th>
+								<th>Owners</th>
+								<th>Link</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>1</td>
+								<td>World of Warcraft</td>
+								<td>Blizzard</td>
+								<td>MMORPG</td>
+								<td>7</td>
+								<td><a href="#"><button type='button' class='btn btn-sm btn-default'>Go</button></a></td>
+							</tr>
+							<tr>
+								<td>2</td>
+								<td>Fallout: New Vegas</td>
+								<td>Bethesda</td>
+								<td>RPG</td>
+								<td>10</td>
+								<td><a href="#"><button type='button' class='btn btn-sm btn-default'>Go</button></a></td>
+							</tr>
+						</tbody>
+					</table>
+					<hr class="pagination-line"/>
+					<center>
+					<ul class="pagination pagination-footer">
+						<li><a href="#">&#60;</a></li>
+						<li><a href="#">1</a></li>
+						<li><a href="#">2</a></li>
+						<li><a href="#">&#62;</a></li>
+					</ul>
+					</center>
+		  		</div>
+			</div>
+			
+		  </div>
+		</div>
+	</div>
+	</div>
+	
+</body>
+</html>
