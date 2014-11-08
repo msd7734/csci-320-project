@@ -31,28 +31,30 @@ public class SteamFriendExplorer {
 		try {
 			cfg = new BufferedReader(new FileReader(cfgPathStr));
 			while (cfg.ready()) {
-				String[] entry = cfg.readLine().split("=");
-				switch (entry[0]) {
-					case "apikey":
-						apiKey = entry[1];
-						break;
-					case "rootsteamid":
-						rootUserId = entry[1];
-						break;
-					case "maxnodes":
-						try {
-							maxNodes = Integer.parseInt(entry[1]);
-						} catch (NumberFormatException nfe) {
-							System.out.println("Bad maxnodes value \"" + entry[1]
-									+ "\". Defaulting to 1.");
-						}
-						break;
-					default:
-						System.out.println("Unexpected config entry: "
-								+ Arrays.stream(entry).collect(Collectors.joining("=")));
-						break;
+				String line = cfg.readLine().replaceAll(" ", "");
+				if (line.length() > 0 && !line.substring(0,1).equals(";")) {
+					String[] entry = line.split("=");
+					switch (entry[0]) {
+						case "apikey":
+							apiKey = entry[1];
+							break;
+						case "rootsteamid":
+							rootUserId = entry[1];
+							break;
+						case "maxnodes":
+							try {
+								maxNodes = Integer.parseInt(entry[1]);
+							} catch (NumberFormatException nfe) {
+								System.out.println("Bad maxnodes value \"" + entry[1]
+										+ "\". Defaulting to 1.");
+							}
+							break;
+						default:
+							System.out.println("Unexpected config entry: "
+									+ Arrays.stream(entry).collect(Collectors.joining("=")));
+							break;
+					}
 				}
-				
 			}
 			
 			System.out.println(apiKey);

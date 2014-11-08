@@ -1,3 +1,7 @@
+; Sample config
+; Semicolons are comments
+; Whitespace is ignored
+
 apikey=abcdefg123456
 rootsteamid=steam_id 2334156701 02
 maxnodes=10
