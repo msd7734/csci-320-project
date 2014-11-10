@@ -36,7 +36,7 @@
        try index.jsf first, welcome.jsf next, and so forth.
    -->
   <welcome-file-list>
-    <welcome-file>index.jsf</welcome-file>
+    <welcome-file>login.jsf</welcome-file>
     <welcome-file>welcome.jsf</welcome-file>
     <welcome-file>index.html</welcome-file>
     <welcome-file>index.jsp</welcome-file>
