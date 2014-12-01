@@ -32,7 +32,7 @@ public class SteamFriendExplorer {
 					decryptArg = i;
 					break;
 				case "-c":
-				case "-configMod":
+				case "-configmod":
 					modConfigArg = i;
 					break;
 			}
