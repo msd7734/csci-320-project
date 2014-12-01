@@ -125,6 +125,8 @@ public class SteamFriendExplorer {
 					System.out.println("The value \"maxnodes\" in the config was malformed (not an integer).");
 				}
 			}
+			
+			SteamApi steamApi = new SteamApi(apiKey, Util.steamIdTo64Bit(rootUserId), maxNodes);
 		}
 		catch (FileNotFoundException fnfe) {
 			System.out.println("No \"config\" file was found in the current directory."
