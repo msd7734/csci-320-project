@@ -127,6 +127,7 @@ public class SteamFriendExplorer {
 			}
 			
 			SteamApi steamApi = new SteamApi(apiKey, Util.steamIdTo64Bit(rootUserId), maxNodes);
+			steamApi.explore();
 		}
 		catch (FileNotFoundException fnfe) {
 			System.out.println("No \"config\" file was found in the current directory."

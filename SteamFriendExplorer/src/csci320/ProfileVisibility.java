@@ -14,7 +14,7 @@ public enum ProfileVisibility {
 	 * is different than the privacy state. It's the effective visibility state from the account making
 	 * the request to the account being viewed given the requesting account's relationship to the viewed account."
 	 */
-	
+	invalid(0),
 	hidden(1),
 	visible(3);
 	
@@ -24,4 +24,15 @@ public enum ProfileVisibility {
 	}
 	
 	public int getValue() { return id; }
+	
+	public static ProfileVisibility valueOf(int i) {
+		switch(i) {
+		case 1:
+			return hidden;
+		case 3:
+			return visible;
+		default:
+			return invalid;
+		}
+	}
 }
