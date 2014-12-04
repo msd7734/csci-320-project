@@ -127,7 +127,12 @@ public class SteamFriendExplorer {
 			}
 			
 			SteamApi steamApi = new SteamApi(apiKey, Util.steamIdTo64Bit(rootUserId), maxNodes);
-			steamApi.explore();
+			try {
+				steamApi.explore();
+			} catch (InaccessibleRootSteamUserException irsue) {
+				System.out.println("The steam profile given as the root was not accessible (is the profile private?)");
+				return;
+			}
 		}
 		catch (FileNotFoundException fnfe) {
 			System.out.println("No \"config\" file was found in the current directory."

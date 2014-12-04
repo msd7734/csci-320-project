@@ -1,6 +1,6 @@
 package csci320;
 
-
+import java.util.Set;
 
 public abstract class Util {
 	private static final String STEAM_ID = "(?i)steam_\\d:\\d:\\d{8}";
@@ -49,5 +49,10 @@ public abstract class Util {
 		}
 		else
 			throw new IllegalArgumentException(idStr + " did not match any known SteamId format");
+	}
+	
+	public static <E> Set<E> concatSet(Set<E> s1, Set<E> s2) {
+		s1.addAll(s2);
+		return s1;
 	}
 }

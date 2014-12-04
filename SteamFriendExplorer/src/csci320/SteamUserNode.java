@@ -1,7 +1,7 @@
 package csci320;
 
-import java.util.List;
-import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 import org.json.*;
 
 public class SteamUserNode {
@@ -12,7 +12,7 @@ public class SteamUserNode {
 	String avatarMed;
 	String avatarFull;
 	ProfileVisibility visibility;
-	List<SteamUserNode> friends;
+	Set<SteamUserNode> friends;
 	
 	public SteamUserNode() { }
 	
@@ -32,8 +32,10 @@ public class SteamUserNode {
 		this.visibility = visibility;
 	}
 
-	public static List<SteamUserNode> getFromJSON(String json, boolean ignoreHidden) {
-		ArrayList<SteamUserNode> res = new ArrayList<SteamUserNode>();
+	public static Set<SteamUserNode> getFromJSON(String json, boolean ignoreHidden) {
+		//using a HashSet to prevent duplicates in case of common friends
+		//delicious data sanitization :D
+		HashSet<SteamUserNode> res = new HashSet<SteamUserNode>();
 		try {
 			JSONArray players = new JSONObject(json).getJSONObject("response").getJSONArray("players");
 			for (int i=0; i<players.length(); ++i) {
@@ -61,11 +63,33 @@ public class SteamUserNode {
 			System.out.println("Some JSON was malformed, so a response may not have been fully parsed.");
 		}
 		
-		//return even if there's an exception -- we'll take what we can get
+		//some of the set might be populated even if there's an exception -- we'll take what we can get
 		return res;
+	}
+	
+	public void addFriendsFromJSON(String json) {
+		//JSONArray friends = new JSONObject(json).getJSONObject("response").getJSONArray("players");
+	}
+	
+	public void addFriend(SteamUserNode n) {
+		friends.add(n);
+	}
+	
+	public long getId() {
+		return id;
 	}
 	
 	public boolean isPublic() {
 		return (visibility.getValue() == 3);
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof SteamUserNode) {
+			SteamUserNode other = (SteamUserNode) o;
+			return (this.id == other.getId());
+		}
+		else
+			return false;
 	}
 }
