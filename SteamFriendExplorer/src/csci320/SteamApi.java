@@ -2,6 +2,7 @@ package csci320;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Set;
 import java.util.HashSet;
 import java.net.*;
@@ -37,16 +38,28 @@ public class SteamApi {
 		Set<SteamUserNode> result = visitPlayers(players);
 		if (result.size() == 0)
 			throw new InaccessibleRootSteamUserException();
-		 
-		
 	}
 	
 	private void initExplore() {
-		//fill in the rootUserNode information and do recursion maybe?
+		//fill in the rootUserNode information first (?)
+	}
+	
+	//this is for testing purposes
+	private List<SteamUserNode> injectTestPlayers(int amt) {
+		this.maxNodes = amt;
+		List<SteamUserNode> p = new ArrayList<SteamUserNode>(amt);
+		Random r = new Random(rootUserNode.getId());
+		for (int i=0;i<amt;++i) {
+			p.add(new SteamUserNode(Math.abs(r.nextLong())));
+		}
+		return p;
 	}
 	
 	private Set<SteamUserNode> visitPlayers(List<SteamUserNode> players) {
-		if (players.size() > maxNodes) {
+		if (players.size() == 0) {
+			return new HashSet<SteamUserNode>();
+		}
+		else if (players.size() > maxNodes) {
 			return visitPlayers(players.subList(0, maxNodes));
 		}
 		else if (players.size() > MAX_PLAYERS_PER_REQUEST) {
@@ -55,8 +68,20 @@ public class SteamApi {
 					visitPlayers(players.subList(MAX_PLAYERS_PER_REQUEST, players.size())));
 		}
 		else {
-			URL url;
 			//construct an API call with comma delimited ids
+			String idParam = String.valueOf(players.get(0).getId());
+			for(int i = 1; i < players.size(); ++i) {
+				idParam += "," + String.valueOf(players.get(i).getId());
+			}
+			
+			String dest = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s";
+			try {
+				URL url = new URL(String.format(dest, key, idParam));
+			} catch (MalformedURLException mue) {
+				//this better not happen...
+			}
+			
+			
 		}
 		return null;
 	}
