@@ -1,21 +1,32 @@
 package beans;
 
+import java.io.Serializable;
+import java.sql.SQLException;
+
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+
+import services.UserService;
 
 @ManagedBean
 @ViewScoped
-public class LoginBean {
+public class LoginBean implements Serializable {
+
+	private static final long serialVersionUID = -4671896801572982760L;
 
 	private String username;
 	private String newUsername;
 	private String password;
 	private String newPassword;
 	private String confirmPassword;
+	private UserService userService;
+	private String requiredFieldMessage = "This field is required.";
 
 	public LoginBean() {
-
+		userService = new UserService();
 	}
 
 	@PostConstruct
@@ -30,7 +41,13 @@ public class LoginBean {
 	 * @return either null indicating login failed or profile
 	 */
 	public String login() {
-		return null;
+		try {
+			if(userService.checkPassword(username, password))
+				return "index.xhtml";
+		} catch (SQLException e) {
+
+		}
+		return "failed";
 	}
 
 	/**
@@ -40,10 +57,24 @@ public class LoginBean {
 	 * @return either null indicating creation failed or profile
 	 */
 	public String createAccount() {
+		try {
+			if (userService.usernameExists(newUsername)) {
+				FacesContext.getCurrentInstance().addMessage("newUserMessages",
+						new FacesMessage("That username already exists."));
+				return null;
+			} else {
+				userService.createAccount(newUsername, newPassword);
+				FacesContext.getCurrentInstance().addMessage("newUserMessages",
+						new FacesMessage("Account created."));
+				return "index.xhtml";
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 
-	// Getts and Setters
+	// Getters and Setters
 	public String getUsername() {
 		return username;
 	}
@@ -82,5 +113,13 @@ public class LoginBean {
 
 	public void setConfirmPassword(String confirmPassword) {
 		this.confirmPassword = confirmPassword;
+	}
+
+	public String getRequiredFieldMessage() {
+		return requiredFieldMessage;
+	}
+
+	public void setRequiredFieldMessage(String requiredFieldMessage) {
+		this.requiredFieldMessage = requiredFieldMessage;
 	}
 }
