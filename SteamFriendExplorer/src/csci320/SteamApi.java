@@ -65,40 +65,45 @@ public class SteamApi {
 					visitPlayers(players.subList(MAX_PLAYERS_PER_REQUEST, players.size())));
 		}
 		else {
-			//construct an API call with comma delimited ids
-			String idParam = "";
-			for(int i = 0; i < players.size(); ++i) {
-				//ignore if this node has already been visited
-				if (!this.visitedUsers.contains(players.get(i)))
-					idParam += "," + String.valueOf(players.get(i).getId());
-			}
-			
-			String dest = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s";
-			try {
-				String query = String.format(dest, key, idParam);
-				URL url = new URL(query);
-				HttpURLConnection con = (HttpURLConnection) url.openConnection();
-				con.setRequestMethod("GET");
-				con.connect();
-				int respCode = con.getResponseCode();
-				if (respCode != 200)
-					System.out.println("Status code: " + respCode + "\nFor request: " + query);
-				else {
-					BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-					String response = reader.lines().collect(Collectors.joining());
-					res = SteamUserNode.getFromJSON(response, false);
-					this.visitedUsers = Util.concatSet(this.visitedUsers, res);
-				}
-				
-			} catch (MalformedURLException mue) {
-				//this better not happen...
-				System.err.println(mue.getMessage());
-			} catch (IOException ioe)  {
-				System.err.println(ioe.getMessage());
-			}
-			
-			return res;
+			return getPlayerSummary(players);
 		}
+	}
+	
+	private Set<SteamUserNode> getPlayerSummary(List<SteamUserNode> players) {
+		Set<SteamUserNode> res = new HashSet<SteamUserNode>();
+		
+		//construct an API call with comma delimited ids
+		String idParam = "";
+		for(int i = 0; i < players.size(); ++i) {
+			//ignore if this node has already been visited
+			if (!this.visitedUsers.contains(players.get(i)))
+				idParam += "," + String.valueOf(players.get(i).getId());
+		}
+		String dest = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s";
+		try {
+			String query = String.format(dest, key, idParam);
+			URL url = new URL(query);
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.setRequestMethod("GET");
+			con.connect();
+			int respCode = con.getResponseCode();
+			if (respCode != 200)
+				System.out.println("Status code: " + respCode + "\nFor request: " + query);
+			else {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+				String response = reader.lines().collect(Collectors.joining());
+				res = SteamUserNode.getFromJSON(response, true);
+				this.visitedUsers = Util.concatSet(this.visitedUsers, res);
+			}
+			
+		} catch (MalformedURLException mue) {
+			//this better not happen...
+			System.err.println(mue.getMessage());
+		} catch (IOException ioe)  {
+			System.err.println(ioe.getMessage());
+		}
+		
+		return res;
 	}
 	
 	private Set<Integer> getFriendIds(SteamUserNode player) {
