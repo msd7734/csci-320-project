@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.*;
+import org.json.*;
 
 public class SteamApi {
 	
@@ -127,7 +128,33 @@ public class SteamApi {
 	
 	private Set<Integer> getFriendIds(SteamUserNode player) {
 		Set<Integer> res = new HashSet<Integer>();
-		//this will also be an API call
+		String dest =  "http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=%s&steamid=%d&relationship=friend";
+		try {
+			String query = String.format(dest, key, player.getId());
+			URL url = new URL(query);
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.setRequestMethod("GET");
+			con.connect();
+			int respCode = con.getResponseCode();
+			if (respCode != 200)
+				System.out.println("Status code: " + respCode + "\nFor request: " + query);
+			else {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+				String response = reader.lines().collect(Collectors.joining());
+				System.out.println(response);
+				JSONArray friends = new JSONObject(response).getJSONObject("friendslist").getJSONArray("friends");
+				for (int i=0;i<friends.length();++i) {
+					JSONObject f = (JSONObject) friends.get(i);
+					res.add(f.getInt("steamid"));
+				}
+			}
+			
+		} catch (MalformedURLException mue) {
+			//again, this better not happen...
+			System.err.println(mue.getMessage());
+		} catch (IOException ioe)  {
+			System.err.println(ioe.getMessage());
+		}
 		return res;
 	}
 	
