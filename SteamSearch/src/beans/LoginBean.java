@@ -25,6 +25,7 @@ public class LoginBean implements Serializable {
 	private UserService userService;
 	private String requiredFieldMessage = "This field is required.";
 
+
 	public LoginBean() {
 		userService = new UserService();
 	}
@@ -44,6 +45,9 @@ public class LoginBean implements Serializable {
 		try {
 			if(userService.checkPassword(username, password))
 				return "index.xhtml";
+			else
+				FacesContext.getCurrentInstance().addMessage("loginMessages",
+						new FacesMessage("Incorrect username/ password."));
 		} catch (SQLException e) {
 
 		}
