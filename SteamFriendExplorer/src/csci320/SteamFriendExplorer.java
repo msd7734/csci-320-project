@@ -112,6 +112,11 @@ public class SteamFriendExplorer {
 		String rootUserId = "NO ROOT USER";
 		int maxNodes = 1;
 		
+		String dbUser = "NO DB USER";
+		String dbPass = "NO DB PASS";
+		String dbHost = "NO DB HOST";
+		String dbPort = "NO DB PORT";
+		
 		try {
 			cfg.read();
 			if (cfg.getPropertyVal("apikey") != null)
@@ -125,6 +130,14 @@ public class SteamFriendExplorer {
 					System.out.println("The value \"maxnodes\" in the config was malformed (not an integer).");
 				}
 			}
+			if (cfg.getPropertyVal("dbuser") != null)
+				dbUser = cfg.getPropertyVal("dbuser");
+			if (cfg.getPropertyVal("dbpass") != null)
+				dbPass = cfg.getPropertyVal("dbpass");
+			if (cfg.getPropertyVal("host") != null)
+				dbHost = cfg.getPropertyVal("host");
+			if (cfg.getPropertyVal("port") != null) 
+				dbPort = cfg.getPropertyVal("port");
 			
 			SteamApi steamApi = new SteamApi(apiKey, Util.steamIdTo64Bit(rootUserId), maxNodes);
 			try {
