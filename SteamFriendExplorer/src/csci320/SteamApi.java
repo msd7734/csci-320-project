@@ -27,26 +27,27 @@ public class SteamApi {
 		this.rootUserNode = new SteamUserNode(rootUserId);
 		this.maxNodes = maxNodes;
 		this.visitedUsers = new HashSet<SteamUserNode>();
-		visitedUsers.add(this.rootUserNode);
 	}
 	
-	public void explore() throws InaccessibleRootSteamUserException {
+	public Set<SteamUserNode> explore() throws InaccessibleRootSteamUserException {
 		//get root
 		//if root is hidden, fail
 		//else, append all visible friends to root as children
 		//recurse on each child
 		//note we can request multiple users at once, so maybe each request should be
 		// all the friends of a user
-		
 		List<SteamUserNode> players = new ArrayList<SteamUserNode>();
 		players.add(this.rootUserNode);
-		Set<SteamUserNode> result = visitPlayers(players);
+		Set<SteamUserNode> result = explore(players);
 		if (result.size() == 0)
 			throw new InaccessibleRootSteamUserException();
+		
+		return result;
 	}
 	
-	private void initExplore() {
-		//fill in the rootUserNode information first (?)
+	private Set<SteamUserNode> explore(List<SteamUserNode> players) {
+		Set<SteamUserNode> result = visitPlayers(players);
+		return result;
 	}
 
 	
@@ -65,9 +66,11 @@ public class SteamApi {
 		}
 		else {
 			//construct an API call with comma delimited ids
-			String idParam = String.valueOf(players.get(0).getId());
-			for(int i = 1; i < players.size(); ++i) {
-				idParam += "," + String.valueOf(players.get(i).getId());
+			String idParam = "";
+			for(int i = 0; i < players.size(); ++i) {
+				//ignore if this node has already been visited
+				if (!this.visitedUsers.contains(players.get(i)))
+					idParam += "," + String.valueOf(players.get(i).getId());
 			}
 			
 			String dest = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s";
@@ -83,7 +86,8 @@ public class SteamApi {
 				else {
 					BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
 					String response = reader.lines().collect(Collectors.joining());
-					return SteamUserNode.getFromJSON(response, false);
+					res = SteamUserNode.getFromJSON(response, false);
+					this.visitedUsers = Util.concatSet(this.visitedUsers, res);
 				}
 				
 			} catch (MalformedURLException mue) {
