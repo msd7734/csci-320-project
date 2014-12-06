@@ -5,6 +5,11 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.stream.Collectors;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.*;
 
 public class SteamApi {
@@ -43,21 +48,12 @@ public class SteamApi {
 	private void initExplore() {
 		//fill in the rootUserNode information first (?)
 	}
-	
-	//this is for testing purposes
-	private List<SteamUserNode> injectTestPlayers(int amt) {
-		this.maxNodes = amt;
-		List<SteamUserNode> p = new ArrayList<SteamUserNode>(amt);
-		Random r = new Random(rootUserNode.getId());
-		for (int i=0;i<amt;++i) {
-			p.add(new SteamUserNode(Math.abs(r.nextLong())));
-		}
-		return p;
-	}
+
 	
 	private Set<SteamUserNode> visitPlayers(List<SteamUserNode> players) {
+		Set<SteamUserNode> res = new HashSet<SteamUserNode>();
 		if (players.size() == 0) {
-			return new HashSet<SteamUserNode>();
+			return res;
 		}
 		else if (players.size() > maxNodes) {
 			return visitPlayers(players.subList(0, maxNodes));
@@ -76,19 +72,48 @@ public class SteamApi {
 			
 			String dest = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s";
 			try {
-				URL url = new URL(String.format(dest, key, idParam));
+				String query = String.format(dest, key, idParam);
+				URL url = new URL(query);
+				HttpURLConnection con = (HttpURLConnection) url.openConnection();
+				con.setRequestMethod("GET");
+				con.connect();
+				int respCode = con.getResponseCode();
+				if (respCode != 200)
+					System.out.println("Status code: " + respCode + "\nFor request: " + query);
+				else {
+					BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+					String response = reader.lines().collect(Collectors.joining());
+					return SteamUserNode.getFromJSON(response, false);
+				}
+				
 			} catch (MalformedURLException mue) {
 				//this better not happen...
+				System.err.println(mue.getMessage());
+			} catch (IOException ioe)  {
+				System.err.println(ioe.getMessage());
 			}
 			
-			
+			return res;
 		}
-		return null;
 	}
 	
 	private Set<Integer> getFriendIds(SteamUserNode player) {
 		Set<Integer> res = new HashSet<Integer>();
 		//this will also be an API call
 		return res;
+	}
+	
+	/*
+	 * TESTING METHODS
+	 */
+	
+	private List<SteamUserNode> injectTestPlayers(int amt) {
+		this.maxNodes = amt;
+		List<SteamUserNode> p = new ArrayList<SteamUserNode>(amt);
+		Random r = new Random(rootUserNode.getId());
+		for (int i=0;i<amt;++i) {
+			p.add(new SteamUserNode(Math.abs(r.nextLong())));
+		}
+		return p;
 	}
 }

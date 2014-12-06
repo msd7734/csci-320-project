@@ -40,10 +40,12 @@ public class SteamUserNode {
 			JSONArray players = new JSONObject(json).getJSONObject("response").getJSONArray("players");
 			for (int i=0; i<players.length(); ++i) {
 				JSONObject p = players.getJSONObject(i);
-				if (ignoreHidden &&
+				if (!ignoreHidden || (ignoreHidden &&
 						p.getInt("communityvisibilitystate") !=
-						ProfileVisibility.hidden.getValue()) {
+						ProfileVisibility.hidden.getValue())) {
 					
+					//note that this is all public data we're getting
+					//private would only be ignored because we can't see friends of private profiles
 					res.add(new SteamUserNode(
 							p.getLong("steamid"),
 							p.getString("personaname"),
@@ -77,6 +79,10 @@ public class SteamUserNode {
 	
 	public long getId() {
 		return id;
+	}
+	
+	public String getPersonaName() {
+		return personaName;
 	}
 	
 	public boolean isPublic() {
