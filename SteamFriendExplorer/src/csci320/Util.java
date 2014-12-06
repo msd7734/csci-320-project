@@ -1,5 +1,9 @@
 package csci320;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public abstract class Util {
@@ -54,5 +58,17 @@ public abstract class Util {
 	public static <E> Set<E> concatSet(Set<E> s1, Set<E> s2) {
 		s1.addAll(s2);
 		return s1;
+	}
+	
+	public static <E> Set<E> trimSet(Set<E> s, int newSize) {
+		if (newSize > s.size())
+			return s;
+		else if (newSize < 1)
+			return new HashSet<E>();
+		
+		List listForm = Arrays.asList(s.toArray());
+		listForm = (List<E>) listForm;
+		listForm = listForm.subList(0, newSize);
+		return new HashSet<E>(listForm);
 	}
 }

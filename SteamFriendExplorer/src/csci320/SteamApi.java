@@ -65,7 +65,26 @@ public class SteamApi {
 					visitPlayers(players.subList(MAX_PLAYERS_PER_REQUEST, players.size())));
 		}
 		else {
-			return getPlayerSummary(players);
+			//keep track of how many total visited, don't add friends > maxNodes
+			res =  getPlayerSummary(players);
+			if (visitedUsers.size() < maxNodes) {
+				for (SteamUserNode p : res) {
+					Set<Integer> friendIds = getFriendIds(p);
+					if (friendIds.size() + visitedUsers.size() > maxNodes)
+						friendIds = Util.trimSet(friendIds, maxNodes - visitedUsers.size());
+					
+					List<SteamUserNode> friends = new ArrayList<SteamUserNode>(friendIds.size());
+					for (Integer id : friendIds) {
+						friends.add(new SteamUserNode(id));
+					}
+					
+					res = Util.concatSet(res, visitPlayers(friends));
+				}
+				
+				return res;
+			}
+			else
+				return res;
 		}
 	}
 	
