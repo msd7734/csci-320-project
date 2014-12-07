@@ -24,6 +24,7 @@ public class SteamApi {
 	private SteamUserNode rootUserNode;
 	private int maxNodes;
 	private Set<SteamUserNode> visitedUsers;
+	private Set<SteamGame> knownGames;
 	
 	public SteamApi(String key, long rootUserId, int maxNodes) {
 		this.key = key;
@@ -184,6 +185,11 @@ public class SteamApi {
 			System.err.println(ioe.getMessage());
 		}
 		return res;
+	}
+	
+	private void bindGames(Set<SteamUserNode> players) {
+		//modify all given players by calling API for GetOwnedGames
+		//bind PlayedGame objects
 	}
 	
 	/*

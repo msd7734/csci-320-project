@@ -14,18 +14,21 @@ public class SteamUserNode {
 	String avatarFull;
 	ProfileVisibility visibility;
 	Set<SteamUserNode> friends;
+	Set<PlayedGame> games;
 	
 	//is this node empty/just an id? Or does it have full player info?
 	boolean isFullNode;
 	
 	public SteamUserNode() { 
 		this.friends = new HashSet<SteamUserNode>();
+		this.games = new HashSet<PlayedGame>();
 		this.isFullNode = false;
 	}
 	
 	public SteamUserNode(long id) {
 		this.id = id;
 		this.friends = new HashSet<SteamUserNode>();
+		this.games = new HashSet<PlayedGame>();
 		this.isFullNode = false;
 	}
 	
@@ -40,6 +43,7 @@ public class SteamUserNode {
 		this.avatarFull = avatarFull;
 		this.visibility = visibility;
 		this.friends = new HashSet<SteamUserNode>();
+		this.games = new HashSet<PlayedGame>();
 		this.isFullNode = true;
 	}
 
