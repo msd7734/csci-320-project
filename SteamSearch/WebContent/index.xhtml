@@ -1,60 +1,73 @@
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
 <h:head>
-	<meta charset="utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-	
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+
 	<title>Steam Searcher</title>
-	
-    <link href="css/bootstrap.css" rel="stylesheet"/>
-	<link href="css/bootstrap-theme.css" rel="stylesheet"/>
-	
-	<link href="Steam.css" rel="stylesheet"/>
-	
+
+	<link href="css/bootstrap.css" rel="stylesheet" />
+	<link href="css/bootstrap-theme.css" rel="stylesheet" />
+
+	<link href="Steam.css" rel="stylesheet" />
+
 </h:head>
 <body>
 	<div class="whole-page">
-	<div class="content-body">
-	  <h1>Steam Searcher</h1>
-		<div class="panel panel-default">
-		  <div class="panel-body">
-			<ul class="nav nav-pills" role="tablist">
-			  <li class="active"><a href="#">Profile</a></li>
-			  <li><a href="Games.xhtml">Games</a></li>
-			  <li><a href="Users.xhtml">Users</a></li>
-			</ul>
-			<hr/>
-			<div class="tab">
-				<div class="row">
-					<h2>Username</h2>
-					<a>change username</a>
-				</div>
-				<div class="row">
-					<div class="col-xs-12 col-sm-6 col-md-6">
-						<h4>Games</h4>
-						<ul>
-							<li><a>game1</a></li>
-							<li><a>game2</a></li>
-							<li><a>game3</a></li>
-							<li><a>game4</a></li>
-						</ul>
+		<div class="content-body">
+			<h1>Steam Searcher</h1>
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<ul class="nav nav-pills" role="tablist">
+						<li class="active"><a href="#">Profile</a></li>
+						<li><a href="Games.xhtml">Games</a></li>
+						<li><a href="Users.xhtml">Users</a></li>
+					</ul>
+					<hr />
+					<div class="tab">
+						<div class="row">
+							<h2>
+								<h:outputText value="#{profileBean.sessionBean.username}" />
+							</h2>
+
+						</div>
+						<div class="row">
+							<div class="col-xs-12 col-sm-6 col-md-6">
+								<h4>Games</h4>
+								<p:dataTable var="game" value="#{profileBean.games}"
+									paginator="true" rows="10">
+									<p:column headerText="Name">
+										<h:outputText value="#{game.name}" />
+									</p:column>
+
+									<p:column headerText="Genre">
+										<h:outputText value="#{game.genre}" />
+									</p:column>
+
+									<p:column headerText="Playtime">
+										<h:outputText value="#{game.playTimeForever}" />
+									</p:column>
+
+								</p:dataTable>
+							</div>
+							<div class="col-xs-12 col-sm-6 col-md-6">
+								<h4>Friends</h4>
+								<p:dataList value="#{profileBean.friends}" var="friend"
+									type="unordered" itemType="none" paginator="true" rows="10"
+									styleClass="paginated">
+									<h:outputText value="#{friend.personaName}"
+										style="display:inline-block" />
+								</p:dataList>
+							</div>
+						</div>
 					</div>
-					<div class="col-xs-12 col-sm-6 col-md-6">
-						<h4>Friends</h4>
-						<ul>
-							<li><a>friend1</a></li>
-							<li><a>friend2</a></li>
-							<li><a>friend3</a></li>
-							<li><a>friend4</a></li>
-						</ul>
-					</div>
+
 				</div>
 			</div>
-			
-		  </div>
 		</div>
 	</div>
-	</div>
-	
+
 </body>
 </html>

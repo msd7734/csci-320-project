@@ -29,10 +29,13 @@
 
 						<h:form>
 							<div class="row">
+								<p:messages for="newUserMessages" severity="info" id="messages"
+									showDetail="false" autoUpdate="true" closable="true" />
 								<div class="col-xs-12 col-sm-6 col-md-6">
 									<h1>Login</h1>
 									<div class="panel panel-default">
 										<div class="panel-body">
+
 											<div class="col-xs-12 col-sm-6 col-md-6">
 												<div class="row">
 													<div class="form-group">
@@ -72,9 +75,7 @@
 										<div class="panel panel-default">
 											<div class="panel-body">
 												<div class="col-xs-12 col-sm-6 col-md-6">
-													<p:messages for="newUserMessages" severity="info"
-														id="messages" showDetail="true" autoUpdate="true"
-														closable="true" />
+
 													<div class="row">
 														<div class="form-group">
 															<label for="newUsername">Username:</label>
@@ -105,7 +106,7 @@
 																styleClass="form-control input-lg"
 																required="#{param['group2']=='1'}"
 																requiredMessage="#{loginBean.requiredFieldMessage}" />
-																<p:message for="confirmPass" />
+															<p:message for="confirmPass" />
 														</div>
 													</div>
 													<div class="row">

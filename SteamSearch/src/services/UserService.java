@@ -12,15 +12,15 @@ import java.sql.SQLException;
  *         table UserService.java
  */
 public class UserService {
-
-	private String url = "jdbc:postgresql://reddwarf.cs.rit.edu/kwj6092";
-	private String connectionUsername = "kwj6092";
-	private String connectionPassword = "eeseineishibohpooyem";
+	
+	private ConnectionService conService;
+	//eeseineishibohpooyem
 
 	public UserService() {
+		conService = new ConnectionService();
 	}
 
-	public void createTable() {
+	public void createTable() throws SQLException {
 		PreparedStatement preparedStatement = null;
 		Connection con = null;
 		String createTableSQL = "CREATE TABLE user ("
@@ -30,7 +30,7 @@ public class UserService {
 
 		try {
 			Class.forName("org.postgresql.Driver");
-			con = DriverManager.getConnection(url, connectionUsername, connectionPassword);
+			con = conService.getConnection();
 			preparedStatement = con.prepareStatement(createTableSQL);
 			preparedStatement.executeUpdate();
 		} catch (ClassNotFoundException e) {
@@ -45,18 +45,12 @@ public class UserService {
 				try {
 					preparedStatement.close();
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 
 			if (con != null) {
-				try {
-					con.close();
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				con.close();
 			}
 
 		}
@@ -77,7 +71,7 @@ public class UserService {
 
 		try {
 			Class.forName("org.postgresql.Driver");
-			con = DriverManager.getConnection(url, connectionUsername, connectionPassword);
+			con = conService.getConnection();
 			preparedStatement = con.prepareStatement(sql);
 			preparedStatement.setString(1, username);
 			ResultSet rs = preparedStatement.executeQuery();
@@ -116,7 +110,7 @@ public class UserService {
 
 		try {
 			Class.forName("org.postgresql.Driver");
-			con = DriverManager.getConnection(url, connectionUsername, connectionPassword);
+			con = conService.getConnection();
 			preparedStatement = con.prepareStatement(sql);
 			preparedStatement.setString(1, username);
 			ResultSet rs = preparedStatement.executeQuery();
@@ -154,11 +148,11 @@ public class UserService {
 
 		try {
 			Class.forName("org.postgresql.Driver");
-			con = DriverManager.getConnection(url, connectionUsername, connectionPassword);
+			con = conService.getConnection();
 			preparedStatement = con.prepareStatement(sql);
 			preparedStatement.setString(1, username);
 			preparedStatement.setString(2, password);
-			int result = preparedStatement.executeUpdate();
+			preparedStatement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
@@ -166,5 +160,39 @@ public class UserService {
 		} finally {
 			con.close();
 		}
+	}
+	
+	/**
+	 * Gets steamId for user
+	 * @param username
+	 * @return
+	 * @throws SQLException 
+	 */
+	public String getSteamId(String username) throws SQLException 
+	{
+		String id = null;
+		PreparedStatement preparedStatement = null;
+		Connection con = null;
+
+		String sql = "select u.steamid from public.user as u where u.username = ?";
+
+		try {
+			Class.forName("org.postgresql.Driver");
+			con = conService.getConnection();
+			preparedStatement = con.prepareStatement(sql);
+			preparedStatement.setString(1, username);
+			ResultSet rs = preparedStatement.executeQuery();
+			while (rs.next()) {
+				id = rs.getString("steamid");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} finally {
+			con.close();
+		}
+		
+		return id;
 	}
 }

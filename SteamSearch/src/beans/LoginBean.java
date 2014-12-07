@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
@@ -25,6 +26,8 @@ public class LoginBean implements Serializable {
 	private UserService userService;
 	private String requiredFieldMessage = "This field is required.";
 
+	@ManagedProperty(value = "#{sessionBean}")
+	private SessionBean sessionBean;
 
 	public LoginBean() {
 		userService = new UserService();
@@ -43,10 +46,11 @@ public class LoginBean implements Serializable {
 	 */
 	public String login() {
 		try {
-			if(userService.checkPassword(username, password))
+			if (userService.checkPassword(username, password)) {
+				sessionBean.setUsername(username);
 				return "index.xhtml";
-			else
-				FacesContext.getCurrentInstance().addMessage("loginMessages",
+			} else
+				FacesContext.getCurrentInstance().addMessage("newUserMessages",
 						new FacesMessage("Incorrect username/ password."));
 		} catch (SQLException e) {
 
@@ -70,6 +74,7 @@ public class LoginBean implements Serializable {
 				userService.createAccount(newUsername, newPassword);
 				FacesContext.getCurrentInstance().addMessage("newUserMessages",
 						new FacesMessage("Account created."));
+				sessionBean.setUsername(username);
 				return "index.xhtml";
 			}
 		} catch (SQLException e) {
@@ -93,6 +98,10 @@ public class LoginBean implements Serializable {
 
 	public void setNewUsername(String newUsername) {
 		this.newUsername = newUsername;
+	}
+
+	public void setSessionBean(SessionBean sessionBean) {
+		this.sessionBean = sessionBean;
 	}
 
 	public String getPassword() {
