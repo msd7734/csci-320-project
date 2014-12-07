@@ -73,9 +73,9 @@ public class SteamApi {
 			System.out.println("Getting friends for " + res.size() + " players");
 			if (visitedUsers.size() < maxNodes) {
 				//can't use foreach here because trying to access member of Set
-				//while iterating like this causes ConcurrentModificationException
+				//while iterating like this causes ConcurrentModificationException (maybe?)
 				Iterator<SteamUserNode> nodeIt = res.iterator();
-				while (nodeIt.hasNext()) {
+				while (nodeIt.hasNext() && visitedUsers.size() < maxNodes) {
 					SteamUserNode p = nodeIt.next();
 					System.out.println("Getting friends of " + p.getPersonaName());
 					Set<Long> friendIds = getFriendIds(p);
@@ -84,6 +84,10 @@ public class SteamApi {
 					//there's a potential problem here with trimming
 					//let's say a person has 100 friends, and 20 are private profiles
 					//we need 20 more to hit maxnodes, trimming may arbitrarily hit those 20 private ones
+					//one issue that also arose:
+					//need 1 more friend to hit maxnodes, current player has 24 friends
+					//the trimmed result has 1 friend, whose profile is private so that friend is skipped
+					//**I suppose this will only be a problem with small sample sets**
 					if (friendIds.size() + visitedUsers.size() > maxNodes) {
 						int newSize = maxNodes - visitedUsers.size();
 						System.out.println("Trimmed friend ids down to " + newSize);
@@ -103,6 +107,11 @@ public class SteamApi {
 					
 					//is the fact that this is modifying res, and then modifying it again
 					//in the resursive call causing a ConcurrentModificationException?
+					//the rules of scope would imply not... but still, wtf?
+					//
+					//The bug happens when:
+					//More than 1 level of recursion deep
+					//About to have enough players to fulfill maxnodes
 					res = Util.concatSet(res, visitPlayers(friends));
 				}
 				
