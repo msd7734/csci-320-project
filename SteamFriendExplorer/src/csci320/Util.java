@@ -1,5 +1,6 @@
 package csci320;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -70,5 +71,15 @@ public abstract class Util {
 		listForm = (List<E>) listForm;
 		listForm = listForm.subList(0, newSize);
 		return new HashSet<E>(listForm);
+	}
+	
+	public static String convertToUTF8(String str) {
+		try {
+			byte[] b = str.getBytes("UTF8");
+			return new String(b, "UTF8");
+		} catch (UnsupportedEncodingException uee) {
+			System.out.println(uee.getMessage());
+			return str;
+		}
 	}
 }

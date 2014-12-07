@@ -142,9 +142,7 @@ public class SteamFriendExplorer {
 			SteamApi steamApi = new SteamApi(apiKey, Util.steamIdTo64Bit(rootUserId), maxNodes);
 			try {
 				Set<SteamUserNode> data = steamApi.explore();
-				for (SteamUserNode n : data) {
-					System.out.println(n.getPersonaName());
-				}
+				// testUserNodeResult(data);
 			} catch (InaccessibleRootSteamUserException irsue) {
 				System.out.println("The steam profile given as the root was not accessible (is the profile private?)");
 				return;
@@ -160,7 +158,20 @@ public class SteamFriendExplorer {
 			System.out.print(io.getMessage());
 			return;
 		}
-		
-		
+	}
+	
+	public static void testUserNodeResult(Set<SteamUserNode> data) {
+		for (SteamUserNode n : data) {
+			System.out.println(n.getPersonaName() + ": ");
+			System.out.println(
+				n.isVisible() ? " IS VISIBLE" : " NOT VISIBLE"
+			);
+			for (SteamUserNode f : n.getFriends()) {
+				if (f.isFullNode())
+					System.out.println(" Populated friend node: " + f.getPersonaName());
+				else
+					System.out.println(" Empty friend node: " + f.getId());
+			}
+		}
 	}
 }

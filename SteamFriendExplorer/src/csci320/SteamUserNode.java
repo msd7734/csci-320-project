@@ -6,6 +6,7 @@ import org.json.*;
 
 public class SteamUserNode {
 	long id;
+	//names should be in unicode
 	String personaName;
 	String profileUrl;
 	String avatar;
@@ -14,13 +15,18 @@ public class SteamUserNode {
 	ProfileVisibility visibility;
 	Set<SteamUserNode> friends;
 	
+	//is this node empty/just an id? Or does it have full player info?
+	boolean isFullNode;
+	
 	public SteamUserNode() { 
 		this.friends = new HashSet<SteamUserNode>();
+		this.isFullNode = false;
 	}
 	
 	public SteamUserNode(long id) {
 		this.id = id;
 		this.friends = new HashSet<SteamUserNode>();
+		this.isFullNode = false;
 	}
 	
 	public SteamUserNode(long id, String personaName, String profileUrl,
@@ -34,6 +40,7 @@ public class SteamUserNode {
 		this.avatarFull = avatarFull;
 		this.visibility = visibility;
 		this.friends = new HashSet<SteamUserNode>();
+		this.isFullNode = true;
 	}
 
 	public static Set<SteamUserNode> getFromJSON(String json, boolean ignoreHidden) {
@@ -52,7 +59,7 @@ public class SteamUserNode {
 					//private would only be ignored because we can't see friends of private profiles
 					res.add(new SteamUserNode(
 							p.getLong("steamid"),
-							p.getString("personaname"),
+							Util.convertToUTF8(p.getString("personaname")),
 							p.getString("profileurl"),
 							p.getString("avatar"),
 							p.getString("avatarmedium"),
@@ -73,10 +80,6 @@ public class SteamUserNode {
 		return res;
 	}
 	
-	public void addFriendsFromJSON(String json) {
-		//JSONArray friends = new JSONObject(json).getJSONObject("response").getJSONArray("players");
-	}
-	
 	public void addFriend(SteamUserNode n) {
 		friends.add(n);
 	}
@@ -89,8 +92,16 @@ public class SteamUserNode {
 		return personaName;
 	}
 	
-	public boolean isPublic() {
+	public boolean isVisible() {
 		return (visibility.getValue() == 3);
+	}
+	
+	public Set<SteamUserNode> getFriends() {
+		return friends;
+	}
+	
+	public boolean isFullNode() {
+		return isFullNode;
 	}
 	
 	@Override

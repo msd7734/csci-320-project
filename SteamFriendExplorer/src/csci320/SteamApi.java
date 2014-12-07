@@ -70,27 +70,20 @@ public class SteamApi {
 		else {
 			//keep track of how many total visited, don't add friends > maxNodes
 			res =  getPlayerSummary(players);
-			System.out.println("Getting friends for " + res.size() + " players");
 			if (visitedUsers.size() < maxNodes) {
 				//can't use foreach here because trying to access member of Set
 				//while iterating like this causes ConcurrentModificationException (maybe?)
 				Iterator<SteamUserNode> nodeIt = res.iterator();
 				while (nodeIt.hasNext() && visitedUsers.size() < maxNodes) {
 					SteamUserNode p = nodeIt.next();
-					System.out.println("Getting friends of " + p.getPersonaName());
 					Set<Long> friendIds = getFriendIds(p);
-					System.out.println("They have " + friendIds.size() + " friends!");
 					
-					//there's a potential problem here with trimming
-					//let's say a person has 100 friends, and 20 are private profiles
-					//we need 20 more to hit maxnodes, trimming may arbitrarily hit those 20 private ones
-					//one issue that also arose:
+					//there's a potential problem here with trimming for example:
 					//need 1 more friend to hit maxnodes, current player has 24 friends
 					//the trimmed result has 1 friend, whose profile is private so that friend is skipped
-					//**I suppose this will only be a problem with small sample sets**
+					//**This will only be a problem with very small datasets**
 					if (friendIds.size() + visitedUsers.size() > maxNodes) {
 						int newSize = maxNodes - visitedUsers.size();
-						System.out.println("Trimmed friend ids down to " + newSize);
 						friendIds = Util.trimSet(friendIds, newSize);
 					}
 					
@@ -125,7 +118,6 @@ public class SteamApi {
 	
 	private Set<SteamUserNode> getPlayerSummary(List<SteamUserNode> players) {
 		Set<SteamUserNode> res = new HashSet<SteamUserNode>();
-		System.out.println("We're about to visit " + players.size() + " players. WhoahDude!!!");
 		//construct an API call with comma delimited ids
 		String idParam = "";
 		for(int i = 0; i < players.size(); ++i) {
@@ -175,7 +167,6 @@ public class SteamApi {
 			else {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
 				String response = reader.lines().collect(Collectors.joining());
-				System.out.println(response);
 				JSONArray friends = new JSONObject(response).getJSONObject("friendslist").getJSONArray("friends");
 				for (int i=0;i<friends.length();++i) {
 					JSONObject f = (JSONObject) friends.get(i);
