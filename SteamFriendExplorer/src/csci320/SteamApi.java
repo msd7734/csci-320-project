@@ -1,5 +1,6 @@
 package csci320;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.*;
+
 import org.json.*;
 
 public class SteamApi {
@@ -68,30 +70,53 @@ public class SteamApi {
 		else {
 			//keep track of how many total visited, don't add friends > maxNodes
 			res =  getPlayerSummary(players);
+			System.out.println("Getting friends for " + res.size() + " players");
 			if (visitedUsers.size() < maxNodes) {
-				for (SteamUserNode p : res) {
-					Set<Integer> friendIds = getFriendIds(p);
-					if (friendIds.size() + visitedUsers.size() > maxNodes)
-						friendIds = Util.trimSet(friendIds, maxNodes - visitedUsers.size());
+				//can't use foreach here because trying to access member of Set
+				//while iterating like this causes ConcurrentModificationException
+				Iterator<SteamUserNode> nodeIt = res.iterator();
+				while (nodeIt.hasNext()) {
+					SteamUserNode p = nodeIt.next();
+					System.out.println("Getting friends of " + p.getPersonaName());
+					Set<Long> friendIds = getFriendIds(p);
+					System.out.println("They have " + friendIds.size() + " friends!");
 					
-					List<SteamUserNode> friends = new ArrayList<SteamUserNode>(friendIds.size());
-					for (Integer id : friendIds) {
-						friends.add(new SteamUserNode(id));
+					//there's a potential problem here with trimming
+					//let's say a person has 100 friends, and 20 are private profiles
+					//we need 20 more to hit maxnodes, trimming may arbitrarily hit those 20 private ones
+					if (friendIds.size() + visitedUsers.size() > maxNodes) {
+						int newSize = maxNodes - visitedUsers.size();
+						System.out.println("Trimmed friend ids down to " + newSize);
+						friendIds = Util.trimSet(friendIds, newSize);
 					}
 					
+					List<SteamUserNode> friends = new ArrayList<SteamUserNode>(friendIds.size());
+					for (Long id : friendIds) {
+						SteamUserNode f = new SteamUserNode(id);
+						//this will add a friend as a node containing only a steamid
+						//the friends' other fields won't get populated based on how exploring is done now
+						//this is fine (I think) because in the DB a "friend" is a just a relation
+						//from player.id -> friend.id
+						p.addFriend(f);
+						friends.add(f);
+					}
+					
+					//is the fact that this is modifying res, and then modifying it again
+					//in the resursive call causing a ConcurrentModificationException?
 					res = Util.concatSet(res, visitPlayers(friends));
 				}
 				
 				return res;
 			}
-			else
+			else {
 				return res;
+			}
 		}
 	}
 	
 	private Set<SteamUserNode> getPlayerSummary(List<SteamUserNode> players) {
 		Set<SteamUserNode> res = new HashSet<SteamUserNode>();
-		
+		System.out.println("We're about to visit " + players.size() + " players. WhoahDude!!!");
 		//construct an API call with comma delimited ids
 		String idParam = "";
 		for(int i = 0; i < players.size(); ++i) {
@@ -126,8 +151,8 @@ public class SteamApi {
 		return res;
 	}
 	
-	private Set<Integer> getFriendIds(SteamUserNode player) {
-		Set<Integer> res = new HashSet<Integer>();
+	private Set<Long> getFriendIds(SteamUserNode player) {
+		Set<Long> res = new HashSet<Long>();
 		String dest =  "http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=%s&steamid=%d&relationship=friend";
 		try {
 			String query = String.format(dest, key, player.getId());
@@ -145,7 +170,10 @@ public class SteamApi {
 				JSONArray friends = new JSONObject(response).getJSONObject("friendslist").getJSONArray("friends");
 				for (int i=0;i<friends.length();++i) {
 					JSONObject f = (JSONObject) friends.get(i);
-					res.add(f.getInt("steamid"));
+					long id = f.getLong("steamid");
+					//don't add the friend if it's already been visited
+					if (!visitedUsers.contains(new SteamUserNode(id)))
+						res.add(id);
 				}
 			}
 			

@@ -14,10 +14,13 @@ public class SteamUserNode {
 	ProfileVisibility visibility;
 	Set<SteamUserNode> friends;
 	
-	public SteamUserNode() { }
+	public SteamUserNode() { 
+		this.friends = new HashSet<SteamUserNode>();
+	}
 	
 	public SteamUserNode(long id) {
 		this.id = id;
+		this.friends = new HashSet<SteamUserNode>();
 	}
 	
 	public SteamUserNode(long id, String personaName, String profileUrl,
@@ -30,6 +33,7 @@ public class SteamUserNode {
 		this.avatarMed = avatarMed;
 		this.avatarFull = avatarFull;
 		this.visibility = visibility;
+		this.friends = new HashSet<SteamUserNode>();
 	}
 
 	public static Set<SteamUserNode> getFromJSON(String json, boolean ignoreHidden) {

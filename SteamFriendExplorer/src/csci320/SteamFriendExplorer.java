@@ -141,7 +141,10 @@ public class SteamFriendExplorer {
 			
 			SteamApi steamApi = new SteamApi(apiKey, Util.steamIdTo64Bit(rootUserId), maxNodes);
 			try {
-				steamApi.explore();
+				Set<SteamUserNode> data = steamApi.explore();
+				for (SteamUserNode n : data) {
+					System.out.println(n.getPersonaName());
+				}
 			} catch (InaccessibleRootSteamUserException irsue) {
 				System.out.println("The steam profile given as the root was not accessible (is the profile private?)");
 				return;
