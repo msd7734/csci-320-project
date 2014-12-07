@@ -63,7 +63,7 @@ public class SteamUserNode {
 					//private would only be ignored because we can't see friends of private profiles
 					res.add(new SteamUserNode(
 							p.getLong("steamid"),
-							Util.convertToUTF8(p.getString("personaname")),
+							p.getString("personaname"),
 							p.getString("profileurl"),
 							p.getString("avatar"),
 							p.getString("avatarmedium"),
@@ -88,6 +88,10 @@ public class SteamUserNode {
 		friends.add(n);
 	}
 	
+	public void addPlayedGame(PlayedGame g) {
+		games.add(g);
+	}
+	
 	public long getId() {
 		return id;
 	}
@@ -102,6 +106,10 @@ public class SteamUserNode {
 	
 	public Set<SteamUserNode> getFriends() {
 		return friends;
+	}
+	
+	public Set<PlayedGame> getPlayedGames() {
+		return games;
 	}
 	
 	public boolean isFullNode() {

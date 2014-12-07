@@ -26,11 +26,25 @@ public class SteamApi {
 	private Set<SteamUserNode> visitedUsers;
 	private Set<SteamGame> knownGames;
 	
+	private int apiCalls;
+	private boolean notifyApiCalls;
+	
 	public SteamApi(String key, long rootUserId, int maxNodes) {
 		this.key = key;
 		this.rootUserNode = new SteamUserNode(rootUserId);
 		this.maxNodes = maxNodes;
 		this.visitedUsers = new HashSet<SteamUserNode>();
+		this.knownGames = new HashSet<SteamGame>();
+		this.notifyApiCalls = false;
+		this.apiCalls = 0;
+	}
+	
+	public Set<SteamGame> getKnownGames() {
+		return knownGames;
+	}
+	
+	public void setNotifyApiCalls(boolean notify) {
+		notifyApiCalls = notify;
 	}
 	
 	public Set<SteamUserNode> explore() throws InaccessibleRootSteamUserException {
@@ -40,17 +54,22 @@ public class SteamApi {
 		//recurse on each child
 		//note we can request multiple users at once, so maybe each request should be
 		// all the friends of a user
+		//bind owned games to full result set
 		List<SteamUserNode> players = new ArrayList<SteamUserNode>();
 		players.add(this.rootUserNode);
 		Set<SteamUserNode> result = explore(players);
 		if (result.size() == 0)
 			throw new InaccessibleRootSteamUserException();
 		
+		if (notifyApiCalls)
+			System.out.println("Total API calls made: " + apiCalls);
+		
 		return result;
 	}
 	
 	private Set<SteamUserNode> explore(List<SteamUserNode> players) {
 		Set<SteamUserNode> result = visitPlayers(players);
+		result = bindGames(result);
 		return result;
 	}
 
@@ -69,6 +88,7 @@ public class SteamApi {
 					visitPlayers(players.subList(MAX_PLAYERS_PER_REQUEST, players.size())));
 		}
 		else {
+			this.apiCalls += 1;
 			//keep track of how many total visited, don't add friends > maxNodes
 			res =  getPlayerSummary(players);
 			if (visitedUsers.size() < maxNodes) {
@@ -118,6 +138,7 @@ public class SteamApi {
 	}
 	
 	private Set<SteamUserNode> getPlayerSummary(List<SteamUserNode> players) {
+		this.apiCalls += 1;
 		Set<SteamUserNode> res = new HashSet<SteamUserNode>();
 		//construct an API call with comma delimited ids
 		String idParam = "";
@@ -187,9 +208,50 @@ public class SteamApi {
 		return res;
 	}
 	
-	private void bindGames(Set<SteamUserNode> players) {
+	private Set<SteamUserNode> bindGames(Set<SteamUserNode> players) {
 		//modify all given players by calling API for GetOwnedGames
 		//bind PlayedGame objects
+		String dest = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?" +
+				"key=%s&steamid=%d&include_appinfo=1&include_played_free_games=1&format=json";
+		for (SteamUserNode p : players) {
+			try {
+				this.apiCalls += 1;
+				String query = String.format(dest, key, p.getId());
+				URL url = new URL(query);
+				HttpURLConnection con = (HttpURLConnection) url.openConnection();
+				con.setRequestMethod("GET");
+				con.connect();
+				int respCode = con.getResponseCode();
+				if (respCode != 200)
+					System.out.println("Status code: " + respCode + "\nFor request: " + query);
+				else {
+					BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+					String response = reader.lines().collect(Collectors.joining());
+					JSONArray ownedGames = new JSONObject(response).getJSONObject("response").getJSONArray("games");
+					for (int i=0;i<ownedGames.length();++i) {
+						JSONObject g = ownedGames.getJSONObject(i);
+						long appId = g.getLong("appid");
+						String name = g.getString("name");
+						String logoHash = g.getString("img_logo_url");
+						int playForever = g.getInt("playtime_forever");
+						int play2Wks = g.has("playtime_2weeks") ? g.getInt("playtime_2weeks") : 0;
+						PlayedGame game = new PlayedGame(appId, name, logoHash, play2Wks, playForever);
+						p.addPlayedGame(game);
+						
+						if (!knownGames.contains(game)) {
+							knownGames.add((SteamGame) game);
+						}
+					}
+				}	
+			} catch (MalformedURLException mue) {
+				//once again, this better not happen...
+				System.err.println(mue.getMessage());
+			} catch (IOException ioe)  {
+				System.err.println(ioe.getMessage());
+			}
+		}
+		
+		return players;
 	}
 	
 	/*

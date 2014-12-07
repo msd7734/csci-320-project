@@ -3,10 +3,12 @@ package csci320;
 public class SteamGame {
 	private long appId;
 	private String name;
+	private String logoHash;
 	
-	public SteamGame(long appId, String name) {
+	public SteamGame(long appId, String name, String logoHash) {
 		this.appId = appId;
 		this.name = name;
+		this.logoHash = logoHash;
 	}
 	
 	public long getId() {
@@ -15,6 +17,10 @@ public class SteamGame {
 	
 	public String getName() {
 		return this.name;
+	}
+	
+	public String getLogoHash() {
+		return this.logoHash;
 	}
 	
 	@Override

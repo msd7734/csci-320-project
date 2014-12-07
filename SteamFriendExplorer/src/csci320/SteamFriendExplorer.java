@@ -140,9 +140,11 @@ public class SteamFriendExplorer {
 				dbPort = cfg.getPropertyVal("port");
 			
 			SteamApi steamApi = new SteamApi(apiKey, Util.steamIdTo64Bit(rootUserId), maxNodes);
+			steamApi.setNotifyApiCalls(true);
 			try {
 				Set<SteamUserNode> data = steamApi.explore();
-				testUserNodeResult(data);
+				printKnownGames(steamApi.getKnownGames());
+				printUserGames((SteamUserNode) data.toArray()[0]);
 			} catch (InaccessibleRootSteamUserException irsue) {
 				System.out.println("The steam profile given as the root was not accessible (is the profile private?)");
 				return;
@@ -160,9 +162,24 @@ public class SteamFriendExplorer {
 		}
 	}
 	
-	public static void testUserNodeResult(Set<SteamUserNode> data) {
+	public static void printKnownGames(Set<SteamGame> games) {
+		System.out.println("Known games: ");
+		for (SteamGame g : games) {
+			System.out.println(" " + g.getId() + " : \"" + g.getName() + "\"");
+		}
+	}
+	
+	public static void printUserGames(SteamUserNode user) {
+		System.out.println(user.getPersonaName() + " owns:");
+		for (PlayedGame g : user.getPlayedGames()) {
+			System.out.println(" " + g.getName() + " (" + g.getPlayTimeForever() / 60 + " total hours played)");
+		}
+	}
+	
+	public static void printUserNodeResult(Set<SteamUserNode> data) {
 		for (SteamUserNode n : data) {
-			System.out.println(n.getPersonaName() + ": ");
+			String playerVis = n.isVisible() ? " (a FULL node)" : " (an EMPTY node)";
+			System.out.println(n.getPersonaName() + playerVis + ": ");
 			System.out.println(
 				n.isVisible() ? " IS VISIBLE" : " NOT VISIBLE"
 			);

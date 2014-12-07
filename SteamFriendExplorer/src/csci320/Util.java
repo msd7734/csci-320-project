@@ -1,11 +1,16 @@
 package csci320;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class Util {
 	private static final String STEAM_ID = "(?i)steam_\\d:\\d:\\d{8}";
@@ -71,15 +76,5 @@ public abstract class Util {
 		listForm = (List<E>) listForm;
 		listForm = listForm.subList(0, newSize);
 		return new HashSet<E>(listForm);
-	}
-	
-	public static String convertToUTF8(String str) {
-		try {
-			byte[] b = str.getBytes("UTF8");
-			return new String(b, "UTF8");
-		} catch (UnsupportedEncodingException uee) {
-			System.out.println(uee.getMessage());
-			return str;
-		}
 	}
 }
