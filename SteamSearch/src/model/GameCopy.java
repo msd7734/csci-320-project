@@ -4,16 +4,16 @@ public class GameCopy extends Game {
 
 	private String appId;
 	private String steamId;
-	private String playTime2Weeks;
-	private String playTimeForever;
+	private int playTime2Weeks;
+	private int playTimeForever;
 	private Game game;
 
 	public GameCopy() {
 
 	}
 
-	public GameCopy(String appId, String steamId, String playTime2Weeks,
-			String playTimeForever) {
+	public GameCopy(String appId, String steamId, int playTime2Weeks,
+			int playTimeForever) {
 		this.appId = appId;
 		this.steamId = steamId;
 		this.playTime2Weeks = playTime2Weeks;
@@ -39,7 +39,7 @@ public class GameCopy extends Game {
 	/**
 	 * @return the playTime2Weeks
 	 */
-	public String getPlayTime2Weeks() {
+	public int getPlayTime2Weeks() {
 		return playTime2Weeks;
 	}
 
@@ -47,14 +47,14 @@ public class GameCopy extends Game {
 	 * @param playTime2Weeks
 	 *            the playTime2Weeks to set
 	 */
-	public void setPlayTime2Weeks(String playTime2Weeks) {
+	public void setPlayTime2Weeks(int playTime2Weeks) {
 		this.playTime2Weeks = playTime2Weeks;
 	}
 
 	/**
 	 * @return the playTimeForever
 	 */
-	public String getPlayTimeForever() {
+	public int getPlayTimeForever() {
 		return playTimeForever;
 	}
 
@@ -62,7 +62,7 @@ public class GameCopy extends Game {
 	 * @param playTimeForever
 	 *            the playTimeForever to set
 	 */
-	public void setPlayTimeForever(String playTimeForever) {
+	public void setPlayTimeForever(int playTimeForever) {
 		this.playTimeForever = playTimeForever;
 	}
 

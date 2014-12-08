@@ -37,13 +37,15 @@ public class GamesService {
 			ResultSet rs = preparedStatement.executeQuery();
 			while (rs.next()) {
 				
-				String appId = rs.getString("appid");
-				String steamId = rs.getString("steamid");
-				String playTime2Weeks = rs.getString("playTime2Weeks");
-				String playTimeForever = rs.getString("playTimeForever");
+				String appId = rs.getString("gameid");
+				String steamId = rs.getString("ownerid");
+				int playTime2Weeks = rs.getInt("playTime2Weeks");
+				int playTimeForever = rs.getInt("playTimeForever");
 				GameCopy gameCopy = new GameCopy(appId, steamId, playTime2Weeks, playTimeForever);
 				Game game = getGame(appId);
-				gameCopy.setGame(game);
+				gameCopy.setName(game.getName());
+				gameCopy.setGenre(game.getGenre());
+				games.add(gameCopy);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

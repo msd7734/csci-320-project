@@ -10,6 +10,10 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import model.SteamAccount;
+import services.AccountService;
+import services.FriendService;
+import services.GamesService;
 import services.UserService;
 
 @ManagedBean
@@ -24,6 +28,9 @@ public class LoginBean implements Serializable {
 	private String newPassword;
 	private String confirmPassword;
 	private UserService userService;
+	private GamesService gamesService;
+	private FriendService friendService;
+	private AccountService accountService;
 	private String requiredFieldMessage = "This field is required.";
 
 	@ManagedProperty(value = "#{sessionBean}")
@@ -31,6 +38,10 @@ public class LoginBean implements Serializable {
 
 	public LoginBean() {
 		userService = new UserService();
+		gamesService = new GamesService();
+		friendService = new FriendService();
+		accountService = new AccountService();
+		
 	}
 
 	@PostConstruct
@@ -48,14 +59,27 @@ public class LoginBean implements Serializable {
 		try {
 			if (userService.checkPassword(username, password)) {
 				sessionBean.setUsername(username);
-				return "index.xhtml";
+				SteamAccount account = null;
+				String steamId;
+				try {
+					steamId = userService.getSteamId(sessionBean.getUsername());
+					account = accountService.getSteamAccount(steamId);
+					if (account != null) {
+						account.setFriends(friendService.getFriendList(steamId));
+						account.setGames(gamesService.getAccountGames(steamId));
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				sessionBean.setAccount(account);
+				return "profile.xhtml";
 			} else
 				FacesContext.getCurrentInstance().addMessage("newUserMessages",
 						new FacesMessage("Incorrect username/ password."));
 		} catch (SQLException e) {
 
 		}
-		return "failed";
+		return null;
 	}
 
 	/**
@@ -75,7 +99,8 @@ public class LoginBean implements Serializable {
 				FacesContext.getCurrentInstance().addMessage("newUserMessages",
 						new FacesMessage("Account created."));
 				sessionBean.setUsername(username);
-				return "index.xhtml";
+				sessionBean.setAccount(null);
+				return "profile.xhtml";
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

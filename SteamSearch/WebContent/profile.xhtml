@@ -21,9 +21,9 @@
 			<div class="panel panel-default">
 				<div class="panel-body">
 					<ul class="nav nav-pills" role="tablist">
-						<li class="active"><a href="#">Profile</a></li>
-						<li><a href="Games.xhtml">Games</a></li>
-						<li><a href="Users.xhtml">Users</a></li>
+						<li class="active"><h:link outcome="profile.xhtml" value="Profile"/></li>
+						<li><h:link outcome="Games.xhtml" value="Games"/></li>
+						<li><h:link outcome="Users.xhtml" value="Users"/></li>
 					</ul>
 					<hr />
 					<div class="tab">
@@ -31,6 +31,9 @@
 							<h2>
 								<h:outputText value="#{profileBean.sessionBean.username}" />
 							</h2>
+							<h4>
+								<h:outputText value="Current Profile: #{profileBean.sessionBean.account.personaName}" />
+							</h4>
 
 						</div>
 						<div class="row">

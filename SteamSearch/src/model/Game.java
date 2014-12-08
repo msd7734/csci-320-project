@@ -11,7 +11,8 @@ public class Game {
 	}
 
 	public Game(String appId, String name, String genre) {
-
+		this.name = name;
+		this.genre = genre;
 	}
 
 	/**

@@ -6,6 +6,8 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 
+import model.SteamAccount;
+
 @ManagedBean
 @SessionScoped
 public class SessionBean implements Serializable {
@@ -13,10 +15,10 @@ public class SessionBean implements Serializable {
 	private static final long serialVersionUID = -5881922104729175891L;
 	
 	private String username;
-	private String steamID;
+	private SteamAccount account;
 	
 	public SessionBean() {
-		steamID = null;
+		account = null;
 	}
 
 	@PostConstruct
@@ -39,17 +41,17 @@ public class SessionBean implements Serializable {
 	}
 
 	/**
-	 * @return the steamID
+	 * @return the account
 	 */
-	public String getSteamID() {
-		return steamID;
+	public SteamAccount getAccount() {
+		return account;
 	}
 
 	/**
-	 * @param steamID the steamID to set
+	 * @param account the account to set
 	 */
-	public void setSteamID(String steamID) {
-		this.steamID = steamID;
+	public void setAccount(SteamAccount account) {
+		this.account = account;
 	}
 
 }

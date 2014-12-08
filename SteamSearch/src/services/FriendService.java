@@ -27,7 +27,7 @@ public class FriendService {
 		PreparedStatement preparedStatement = null;
 		Connection con = null;
 
-		String sql = "select a.steamid, a.personaname from public.steamAccount as a,"
+		String sql = "select a.steamid, a.\"personaName\" from public.steamAccount as a,"
 				+ " public.friendsWith as f where a.steamid = f.friendid and f.steamid = ?";
 
 		try {
@@ -38,7 +38,7 @@ public class FriendService {
 			ResultSet rs = preparedStatement.executeQuery();
 			while (rs.next()) {
 				String id = rs.getString("steamid");
-				String persona = rs.getString("personaname");
+				String persona = rs.getString("personaName");
 				SteamAccount account = new SteamAccount();
 				account.setPersonaName(persona);
 				account.setSteamId(id);

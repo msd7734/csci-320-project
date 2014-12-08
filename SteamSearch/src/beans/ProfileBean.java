@@ -12,6 +12,7 @@ import javax.faces.bean.ViewScoped;
 import model.Game;
 import model.GameCopy;
 import model.SteamAccount;
+import services.AccountService;
 import services.FriendService;
 import services.GamesService;
 import services.UserService;
@@ -29,6 +30,7 @@ public class ProfileBean implements Serializable {
 	private UserService userService;
 	private GamesService gamesService;
 	private FriendService friendService;
+	private AccountService accountService;
 	private ArrayList<GameCopy> games;
 	private ArrayList<SteamAccount> friends;
 	
@@ -38,49 +40,30 @@ public class ProfileBean implements Serializable {
 	
 	@PostConstruct
 	public void init() {
-		games = new ArrayList<GameCopy>();
-		friends = new ArrayList<SteamAccount>();
-		
-		friends.add(new SteamAccount("0", "Gunslinger"));
-		friends.add(new SteamAccount("1", "TomatoMayo"));
-		friends.add(new SteamAccount("2", "AlphaAngel"));
-		friends.add(new SteamAccount("3", "Yaminick"));
-		friends.add(new SteamAccount("4", "DialtonLazor"));
-		
-		GameCopy copy = new GameCopy("0", "0", "", "500 hours");
-		copy.setName("Skyrim");
-		copy.setGenre("RPG");
-		
-		GameCopy copy1 = new GameCopy("1", "0", "", "100 hours");
-		copy1.setName("Dragon Age");
-		copy1.setGenre("RPG");
-		
-		GameCopy copy2 = new GameCopy("2", "0", "", "40 hours");
-		copy2.setName("Call of Duty");
-		copy2.setGenre("Shooter");
-		
-		GameCopy copy3 = new GameCopy("3", "0", "", "18 hours");
-		copy3.setName("Portal");
-		copy3.setGenre("Puzzle");
-		
-		games.add(copy);
-		games.add(copy1);
-		games.add(copy2);
-		games.add(copy3);
+		setup();
 	}
 	
 	public void setup() {
 		setUserService(new UserService());
 		gamesService = new GamesService();
 		friendService = new FriendService();
-		try {
-			steamId = userService.getSteamId(sessionBean.getUsername());
-			friends = friendService.getFriendList(steamId);
-			games = gamesService.getAccountGames(steamId);
-		} catch (SQLException e) {
-			e.printStackTrace();
+		accountService = new AccountService();
+		SteamAccount account = sessionBean.getAccount();
+		if(account != null) {
+			steamId = account.getSteamId();
+			friends = account.getFriends();
+			games = account.getGames();
+		} else {
+			steamId = null;
+			friends = new ArrayList<SteamAccount>();
+			games = new ArrayList<GameCopy>();
 		}
-		sessionBean.setSteamID(steamId);
+	}
+	
+	public String setActiveAccount(String steamid) {
+		
+		
+		return null;
 	}
 
 	public SessionBean getSessionBean() {
