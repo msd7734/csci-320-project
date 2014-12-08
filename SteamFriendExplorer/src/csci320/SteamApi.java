@@ -87,7 +87,6 @@ public class SteamApi {
 					visitPlayers(players.subList(MAX_PLAYERS_PER_REQUEST, players.size())));
 		}
 		else {
-			this.apiCalls += 1;
 			//keep track of how many total visited, don't add friends > maxNodes
 			res =  getPlayerSummary(players);
 			if (visitedUsers.size() < maxNodes) {
@@ -170,6 +169,7 @@ public class SteamApi {
 	}
 	
 	private Set<Long> getFriendIds(SteamUserNode player) {
+		this.apiCalls += 1;
 		Set<Long> res = new HashSet<Long>();
 		String response = "";
 		String dest =  "http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=%s&steamid=%d&relationship=friend";
