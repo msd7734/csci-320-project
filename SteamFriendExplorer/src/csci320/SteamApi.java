@@ -117,14 +117,6 @@ public class SteamApi {
 						p.addFriend(f);
 						friends.add(f);
 					}
-					
-					//is the fact that this is modifying res, and then modifying it again
-					//in the resursive call causing a ConcurrentModificationException?
-					//the rules of scope would imply not... but still, wtf?
-					//
-					//The bug happens when:
-					//More than 1 level of recursion deep
-					//About to have enough players to fulfill maxnodes
 					res = Util.concatSet(res, visitPlayers(friends));
 				}
 				
@@ -147,6 +139,7 @@ public class SteamApi {
 				idParam += "," + String.valueOf(players.get(i).getId());
 		}
 		String dest = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s";
+		String response = "";
 		try {
 			String query = String.format(dest, key, idParam);
 			URL url = new URL(query);
@@ -158,11 +151,14 @@ public class SteamApi {
 				System.out.println("Status code: " + respCode + "\nFor request: " + query);
 			else {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-				String response = reader.lines().collect(Collectors.joining());
+				response = reader.lines().collect(Collectors.joining());
 				res = SteamUserNode.getFromJSON(response, true);
 				this.visitedUsers = Util.concatSet(this.visitedUsers, res);
 			}
 			
+		} catch (JSONException jse) {
+			System.err.println(jse.getMessage());
+			System.out.println(response);
 		} catch (MalformedURLException mue) {
 			//this better not happen...
 			System.err.println(mue.getMessage());
@@ -175,6 +171,7 @@ public class SteamApi {
 	
 	private Set<Long> getFriendIds(SteamUserNode player) {
 		Set<Long> res = new HashSet<Long>();
+		String response = "";
 		String dest =  "http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=%s&steamid=%d&relationship=friend";
 		try {
 			String query = String.format(dest, key, player.getId());
@@ -187,7 +184,7 @@ public class SteamApi {
 				System.out.println("Status code: " + respCode + "\nFor request: " + query);
 			else {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-				String response = reader.lines().collect(Collectors.joining());
+				response = reader.lines().collect(Collectors.joining());
 				JSONArray friends = new JSONObject(response).getJSONObject("friendslist").getJSONArray("friends");
 				for (int i=0;i<friends.length();++i) {
 					JSONObject f = (JSONObject) friends.get(i);
@@ -198,6 +195,9 @@ public class SteamApi {
 				}
 			}
 			
+		} catch (JSONException jse) {
+			System.err.println(jse.getMessage());
+			System.out.println(response);
 		} catch (MalformedURLException mue) {
 			//again, this better not happen...
 			System.err.println(mue.getMessage());
@@ -212,6 +212,7 @@ public class SteamApi {
 		//bind PlayedGame objects
 		String dest = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?" +
 				"key=%s&steamid=%d&include_appinfo=1&include_played_free_games=1&format=json";
+		String response = "";
 		for (SteamUserNode p : players) {
 			try {
 				this.apiCalls += 1;
@@ -225,23 +226,29 @@ public class SteamApi {
 					System.out.println("Status code: " + respCode + "\nFor request: " + query);
 				else {
 					BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-					String response = reader.lines().collect(Collectors.joining());
-					JSONArray ownedGames = new JSONObject(response).getJSONObject("response").getJSONArray("games");
-					for (int i=0;i<ownedGames.length();++i) {
-						JSONObject g = ownedGames.getJSONObject(i);
-						long appId = g.getLong("appid");
-						String name = g.getString("name");
-						String logoHash = g.getString("img_logo_url");
-						int playForever = g.getInt("playtime_forever");
-						int play2Wks = g.has("playtime_2weeks") ? g.getInt("playtime_2weeks") : 0;
-						PlayedGame game = new PlayedGame(appId, name, logoHash, play2Wks, playForever);
-						p.addPlayedGame(game);
-						
-						if (!knownGames.contains(game)) {
-							knownGames.add((SteamGame) game);
+					response = reader.lines().collect(Collectors.joining());
+					int numGames = new JSONObject(response).getJSONObject("response").getInt("game_count");
+					if (numGames > 0) {
+						JSONArray ownedGames = new JSONObject(response).getJSONObject("response").getJSONArray("games");
+						for (int i=0;i<ownedGames.length();++i) {
+							JSONObject g = ownedGames.getJSONObject(i);
+							long appId = g.getLong("appid");
+							String name = g.getString("name");
+							String logoHash = g.getString("img_logo_url");
+							int playForever = g.getInt("playtime_forever");
+							int play2Wks = g.has("playtime_2weeks") ? g.getInt("playtime_2weeks") : 0;
+							PlayedGame game = new PlayedGame(appId, name, logoHash, play2Wks, playForever);
+							p.addPlayedGame(game);
+							
+							if (!knownGames.contains(game)) {
+								knownGames.add((SteamGame) game);
+							}
 						}
 					}
-				}	
+				}
+			} catch (JSONException jse) {
+				System.err.println(jse.getMessage());
+				System.out.println(response);
 			} catch (MalformedURLException mue) {
 				//once again, this better not happen...
 				System.err.println(mue.getMessage());

@@ -148,10 +148,14 @@ public class SteamFriendExplorer {
 			
 			try {
 				Set<SteamUserNode> data = steamApi.explore();
-				printKnownGames(steamApi.getKnownGames());
 				PostgresDB database = new PostgresDB(dbUser, dbPass, dbHost, dbPort);
-				//database.persistUserData(data);
-				database.persistGameData(steamApi.getKnownGames());
+				System.out.println("Starting database operations...");
+				long time = - System.currentTimeMillis();
+				int affectedRows = database.persistGameData(steamApi.getKnownGames());
+				affectedRows += database.persistUserData(data);
+				time += System.currentTimeMillis();
+				System.out.println("Database operations completed in " + time + "ms");
+				System.out.println(affectedRows + " row(s) affected");
 			} catch (InaccessibleRootSteamUserException irsue) {
 				System.out.println("The steam profile given as the root was not accessible (is the profile private?)");
 				return;
