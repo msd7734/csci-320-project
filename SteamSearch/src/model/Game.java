@@ -5,6 +5,7 @@ public class Game {
 	private String name;
 	private String appId;
 	private String genre;
+	private int owners;
 
 	public Game() {
 
@@ -13,6 +14,17 @@ public class Game {
 	public Game(String appId, String name, String genre) {
 		this.name = name;
 		this.genre = genre;
+	}
+	
+	public Game(String appId, String name, String genre, int owners) {
+		this.appId = appId;
+		this.name = name;
+		this.genre = genre;
+		this.setOwners(owners);
+	}
+	
+	public void incOwners(){
+		owners += 1;
 	}
 
 	/**
@@ -58,6 +70,20 @@ public class Game {
 	 */
 	public void setGenre(String genre) {
 		this.genre = genre;
+	}
+
+	/**
+	 * @return the owners
+	 */
+	public int getOwners() {
+		return owners;
+	}
+
+	/**
+	 * @param owners the owners to set
+	 */
+	public void setOwners(int owners) {
+		this.owners = owners;
 	}
 
 }

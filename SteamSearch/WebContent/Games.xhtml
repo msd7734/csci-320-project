@@ -1,149 +1,210 @@
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core">
 <h:head>
-	<meta charset="utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-	
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+
 	<title>Steam Searcher</title>
-	
-    <link href="css/bootstrap.css" rel="stylesheet"/>
-	<link href="css/bootstrap-theme.css" rel="stylesheet"/>
-	
-	<link href="Steam.css" rel="stylesheet"/>
-	
+
+	<link href="css/bootstrap.css" rel="stylesheet" />
+	<link href="css/bootstrap-theme.css" rel="stylesheet" />
+
+	<link href="Steam.css" rel="stylesheet" />
+
 </h:head>
 <body>
+
 	<div class="whole-page">
-	<div class="content-body">
-	  <h1>Steam Searcher</h1>
-	  <a href="http://steampowered.com" target="_blank">Powered By Steam</a>
-		<div class="panel panel-default">
-		  <div class="panel-body">
-			<ul class="nav nav-pills" role="tablist">
-			  <li><h:link outcome="profile.xhtml" value="Profile"/></li>
-			  <li class="active"><h:link outcome="Games.xhtml" value="Games"/></li>
-			  <li><h:link outcome="Users.xhtml" value="Users"/></li>
-			</ul>
-			<hr/>
-			<div class="tab">
-				<h2>Game Search:</h2>
-				<div class="panel panel-default">
-		  			<div class="panel-body">
-		  				<form>
-			  				<div class="row">
-								<div class="col-xs-12 col-sm-6 col-md-6">
-									<div class="form-group">
-										<label for="title">Game Title:</label>
-										<input type="text" name="title" id="title" class="form-control input-lg" tabindex="1"/>
-									</div>
-								</div>
-								<div class="col-xs-12 col-sm-6 col-md-6">
-									<div class="form-group">
-										<label for="genre">Genre:</label>
-										<input list="genre" class="form-control input-lg" name="state" tabindex="2"/>
-										<datalist id="genre">
-										<option value="Action"/>
-										<option value="Adventure"/>
-										<option value="RPG"/>
-										<option value="MMORPG"/>
-										<option value="Platformer"/>
-										<option value="Fighting"/>
-										<option value="FPS"/>
-										</datalist>
-									</div>
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-xs-12 col-sm-6 col-md-6">
-									<div class="form-group">
-										<label for="studio">Game Studio:</label>
-										<input type="text" name="studio" id="studio" class="form-control input-lg" tabindex="3"/>
-									</div>
-								</div>
-								<div class="col-xs-12 col-sm-6 col-md-6">
-									<div class="form-group">
-										<label for="owners">Minimum number of owners:</label>
-										<input type="text" name="owners" id="owners" class="form-control input-lg" tabindex="4"/>
-									</div>
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-xs-12 col-sm-6 col-md-6">
-									<div class="form-group">
-										<label>Options:</label><br/>
-										<input type="checkbox"/> Use Friendslist<br/>
-										<input type="checkbox"/> Similar to Library<br/>
-									</div>
-								</div>
-								<div class="col-xs-12 col-sm-6 col-md-6">
-									<div class="form-group">
-										<label for="sort">Sort by:</label>
-										<input list="sort" class="form-control input-lg" name="state" tabindex="2"/>
-										<datalist id="sort">
-										<option value="Alphabetical"/>
-										<option value="Community Playtime"/>
-										<option value="Genre"/>
-										</datalist>
-									</div>
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-xs-12 col-sm-6 col-md-6">
-									<button type='button' class='btn btn-sm btn-default'>Search</button>
-								</div>
-							</div>
-		  				</form>
-		  			</div>
-		  		</div>
-		  		<div>
-		  			<h2>Results:</h2>
-		  			<hr/>
-		  			<table class="table">
-						<thead>
-							<tr class="filters">
-								<th>#</th>
-								<th>Game Title</th>
-								<th>Studio</th>
-								<th>Genre</th>
-								<th>Owners</th>
-								<th>Link</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>1</td>
-								<td>World of Warcraft</td>
-								<td>Blizzard</td>
-								<td>MMORPG</td>
-								<td>7</td>
-								<td><a href="#"><button type='button' class='btn btn-sm btn-default'>Go</button></a></td>
-							</tr>
-							<tr>
-								<td>2</td>
-								<td>Fallout: New Vegas</td>
-								<td>Bethesda</td>
-								<td>RPG</td>
-								<td>10</td>
-								<td><a href="#"><button type='button' class='btn btn-sm btn-default'>Go</button></a></td>
-							</tr>
-						</tbody>
-					</table>
-					<hr class="pagination-line"/>
-					<center>
-					<ul class="pagination pagination-footer">
-						<li><a href="#">&#60;</a></li>
-						<li><a href="#">1</a></li>
-						<li><a href="#">2</a></li>
-						<li><a href="#">&#62;</a></li>
+		<div class="content-body">
+			<h1>Steam Searcher</h1>
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<ul class="nav nav-pills" role="tablist">
+						<li><h:link outcome="profile.xhtml" value="Profile" /></li>
+						<li class="active"><h:link outcome="Games.xhtml" value="Games" /></li>
+						<li><h:link outcome="Users.xhtml"
+								value="Users" /></li>
 					</ul>
-					</center>
-		  		</div>
+					<hr />
+					<div class="tab">
+						<h2>Game Search:</h2>
+						<div class="panel panel-default">
+							<div class="panel-body">
+								<h:form>
+									<div class="row">
+										<div class="col-xs-12 col-sm-6 col-md-6">
+											<div class="form-group">
+												<label for="title">Game Title:</label>
+												<h:inputText type="text" value="#{gameSearchBean.name}"
+													name="title" id="title" class="form-control input-lg"
+													tabindex="1" />
+											</div>
+										</div>
+										<div class="col-xs-12 col-sm-6 col-md-6">
+											<div class="form-group">
+												<label for="genre">Genre:</label>
+												<h:selectOneMenu value="#{gameSearchBean.genre}" id="genre"
+													class="form-control input-lg" name="state" tabindex="2">
+													<f:selectItem itemValue="Not Specified"
+														itemLabel="Not Specified" />
+													<f:selectItem itemValue="Action" itemLabel="Action" />
+													<f:selectItem itemValue="Adventure" itemLabel="Adventure" />
+													<f:selectItem itemValue="RPG" itemLabel="RPG" />
+													<f:selectItem itemValue="MMORPG" itemLabel="MMORPG" />
+													<f:selectItem itemValue="Platformer" itemLabel="Platformer" />
+													<f:selectItem itemValue="Fighting" itemLabel="Fighting" />
+													<f:selectItem itemValue="FPS" itemLabel="FPS" />
+												</h:selectOneMenu>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-xs-12 col-sm-6 col-md-6">
+											<div class="form-group">
+												<label for="studio">Game Studio:</label>
+												<h:inputText value="#{gameSearchBean.studio}" name="studio"
+													id="studio" class="form-control input-lg" tabindex="3" />
+											</div>
+										</div>
+										<div class="col-xs-12 col-sm-6 col-md-6">
+											<div class="form-group">
+												<label for="owners">Minimum number of owners:</label>
+												<h:inputText value="#{gameSearchBean.owners}" name="owners"
+													id="owners" class="form-control input-lg" tabindex="4" />
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-xs-12 col-sm-6 col-md-6">
+											<div class="form-group">
+												<label>Options:</label><br />
+												<h:selectBooleanCheckbox
+													value="#{gameSearchBean.useFriendslist}"
+													id="useFriendslist" />
+												Use Friendslist
+												<h:selectBooleanCheckbox
+													value="#{gameSearchBean.similarToLibrary}"
+													id="similarToLibrary" />
+												Similar to library
+											</div>
+										</div>
+										<div class="col-xs-12 col-sm-6 col-md-6">
+											<div class="form-group">
+												<label for="sort">Sort by:</label>
+												<h:selectOneMenu value="#{gameSearchBean.sortBy}"
+													id="sortBy" class="form-control input-lg" name="state"
+													tabindex="2">
+													<f:selectItem itemValue="Not Specified"
+														itemLabel="Not Specified" />
+													<f:selectItem itemValue="Alphabetical"
+														itemLabel="Alphabetical" />
+													<f:selectItem itemValue="Reverse Alphabetical"
+														itemLabel="Reverse Alphabetical" />
+													<f:selectItem itemValue="Community Playtime"
+														itemLabel="Community Playtime" />
+													<f:selectItem itemValue="Genre" itemLabel="Genre" />
+												</h:selectOneMenu>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-xs-12 col-sm-6 col-md-6">
+											<h:commandButton value="Search" update="resultsBody"
+												styleClass="btn btn-sm btn-default"
+												actionListener="#{gameSearchBean.search}">
+												<f:ajax
+													execute="genre title owners useFriendslist similarToLibrary sortBy"
+													render="results pages" />
+											</h:commandButton>
+										</div>
+									</div>
+								</h:form>
+							</div>
+						</div>
+						<div>
+							<h2>Results:</h2>
+							<hr />
+							<h:outputText id="results" value="#{gameSearchBean.table}"
+								escape="false" />
+							<!--
+			  			<table class="table">
+							<thead>
+								<tr class="filters">
+									<th>#</th>
+									<th>Game Title</th>
+									<th>Studio</th>
+									<th>Genre</th>
+									<th>Owners</th>
+									<th>Link</th>
+								</tr>
+							</thead>
+							<tbody>
+								
+								
+								 <tr>
+									<td>1</td>
+									<td>World of Warcraft</td>
+									<td>Blizzard</td>
+									<td>MMORPG</td>
+									<td>7</td>
+									<td><a href="#"><button type='button' class='btn btn-sm btn-default'>Go</button></a></td>
+								</tr>
+								<tr>
+									<td>2</td>
+									<td>Fallout: New Vegas</td>
+									<td>Bethesda</td>
+									<td>RPG</td>
+									<td>10</td>
+									<td><a href="#"><button type='button' class='btn btn-sm btn-default'>Go</button></a></td>
+								</tr>
+								
+							</tbody>
+						</table>
+						-->
+							<hr class="pagination-line" />
+
+							<h:form>
+								<div class="row">
+									<center>
+										<div class="col-xs-12 col-sm-6 col-md-4">
+											<div class="form-group">
+												<h:commandButton value='&#60;'
+													styleClass='btn btn-sm btn-default'
+													actionListener='#{gameSearchBean.decResultsPage}'>
+													<f:ajax render='results pages' />
+												</h:commandButton>
+											</div>
+										</div>
+										<div class="col-xs-12 col-sm-6 col-md-4">
+											<div class="form-group">
+												<h:outputText id="pages" value="#{gameSearchBean.pages}"
+													escape="false">1</h:outputText>
+											</div>
+										</div>
+										<div class="col-xs-12 col-sm-6 col-md-4">
+											<div class="form-group">
+												<h:commandButton value='&#62;'
+													styleClass='btn btn-sm btn-default'
+													actionListener='#{gameSearchBean.incResultsPage}'>
+													<f:ajax render='results pages' />
+												</h:commandButton>
+											</div>
+										</div>
+									</center>
+								</div>
+
+							</h:form>
+
+						</div>
+					</div>
+
+				</div>
 			</div>
-			
-		  </div>
 		</div>
 	</div>
-	</div>
-	
+
 </body>
 </html>
