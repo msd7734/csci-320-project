@@ -2,6 +2,7 @@ package csci320;
 
 import java.util.Set;
 import java.util.HashSet;
+
 import org.json.*;
 
 public class SteamUserNode {
@@ -117,12 +118,24 @@ public class SteamUserNode {
 	}
 	
 	@Override
-	public boolean equals(Object o) {
-		if (o instanceof SteamUserNode) {
-			SteamUserNode other = (SteamUserNode) o;
-			return (this.id == other.getId());
-		}
-		else
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
 			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SteamUserNode other = (SteamUserNode) obj;
+		if (id != other.id)
+			return false;
+		return true;
 	}
 }

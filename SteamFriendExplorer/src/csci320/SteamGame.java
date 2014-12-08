@@ -24,12 +24,24 @@ public class SteamGame {
 	}
 	
 	@Override
-	public boolean equals(Object o) {
-		if (o instanceof SteamGame) {
-			SteamGame other = (SteamGame) o;
-			return this.getId() == other.getId();
-		}
-		else
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (appId ^ (appId >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
 			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SteamGame other = (SteamGame) obj;
+		if (appId != other.appId)
+			return false;
+		return true;
 	}
 }

@@ -3,7 +3,11 @@ package csci320;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.sql.BatchUpdateException;
+import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Set;
@@ -144,10 +148,23 @@ public class SteamFriendExplorer {
 			
 			try {
 				Set<SteamUserNode> data = steamApi.explore();
+				printKnownGames(steamApi.getKnownGames());
 				PostgresDB database = new PostgresDB(dbUser, dbPass, dbHost, dbPort);
+				//database.persistUserData(data);
+				database.persistGameData(steamApi.getKnownGames());
 			} catch (InaccessibleRootSteamUserException irsue) {
 				System.out.println("The steam profile given as the root was not accessible (is the profile private?)");
 				return;
+			} catch (BatchUpdateException bue) {
+				System.out.println(bue.getMessage());
+				bue.printStackTrace();
+				bue.getNextException().printStackTrace();
+			} catch (SQLException sqle) {
+				System.out.println(sqle.getMessage());
+				sqle.printStackTrace();
+			} catch (ClassNotFoundException cnfe) {
+				System.out.println(cnfe.getMessage());
+				cnfe.printStackTrace();
 			}
 		}
 		catch (FileNotFoundException fnfe) {

@@ -5,6 +5,9 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -76,5 +79,20 @@ public abstract class Util {
 		listForm = (List<E>) listForm;
 		listForm = listForm.subList(0, newSize);
 		return new HashSet<E>(listForm);
+	}
+	
+	public static void iterateResultSet(ResultSet r) throws SQLException {
+		ResultSetMetaData meta = r.getMetaData();
+		int columnCount = meta.getColumnCount();
+		String[] colLabels = new String[columnCount];
+		for (int i=0;i<columnCount;++i) {
+			colLabels[i] = meta.getColumnName(i+1);
+		}
+		while (r.next()) {
+			for (int i=0;i<columnCount;++i) {
+				System.out.print(colLabels[i] + " : " + r.getObject(i+1) + ",  ");
+			}
+			System.out.println();
+		}
 	}
 }
