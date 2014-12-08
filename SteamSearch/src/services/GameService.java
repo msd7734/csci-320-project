@@ -26,11 +26,11 @@ public class GameService {
 		boolean first = true;
 		ArrayList<Game> results = new ArrayList<Game>();
 		
-		if(genre.compareTo("Not Specified") != 0){
+		/*if(genre.compareTo("Not Specified") != 0){
 			query += " where LOWER(g.genre) = LOWER('" + genre + "')";
 			first = false;
 		}
-		
+		*/
 		if(name.compareTo("") != 0){
 			if(!first)
 				query += " AND ";
@@ -51,7 +51,6 @@ public class GameService {
 			}
 		}
 		
-		System.out.println(query);
 		
 		/*
 		if(studio != null){

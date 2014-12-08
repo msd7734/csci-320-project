@@ -81,13 +81,12 @@ public class GameSearchBean implements Serializable {
 		gamesSet = new HashSet<String>(100);
 		
 		String username = sessionBean.getUsername();
-		System.out.println(username);
+		
 		String steamId = userService.getSteamId(username);
-		System.out.println(steamId);
+		
 		SteamAccount account = accountService.getSteamAccount(steamId);
 		//SteamAccount account = sessionBean.getAccount();
 		if(account != null) {
-			System.out.println("account not null");
 			//friends = friendService.getFriendList(steamId);
 			games = gamesService.getAccountGames(steamId);
 		} else {
@@ -109,7 +108,6 @@ public class GameSearchBean implements Serializable {
 			}
 		}
 		*/
-		System.out.println("friendsGames: " + friendsGames.size());
 		
 		/*
 		for(int i = 0; i<games.size(); i++){
@@ -133,10 +131,11 @@ public class GameSearchBean implements Serializable {
 	
 	public void search(ActionEvent actionEvent){
 		ArrayList<Game> results;
+		this.resultsPage = 1;
 		
 		if(!useFriendslist){
 			results = gameService.SearchGames(genre, name, sortBy);
-			this.resultsPage = 1;
+			
 			
 			if(results != null){
 				if(owners.compareTo("") != 0){
@@ -149,17 +148,37 @@ public class GameSearchBean implements Serializable {
 					}
 				}
 				
-				this.maxPages = (results.size()/25);
-				if(results.size()% 25 > 0)
-					this.maxPages += 1;
+				
 			}
 			
 		} else {
 			results = friendsGames;
+			if(name.compareTo("") != 0){
+				System.out.println("name match");
+				for(int i = 0; i< results.size(); i++){
+					Game cur = results.get(i);
+					if( name.compareTo(cur.getName()) != 0){
+						results.remove(i);
+					}
+				}
+			}
 			
-			
+			if(owners.compareTo("") != 0){
+				System.out.println("min owners");
+				int ownerMin = Integer.parseInt(owners);
+				System.out.println("ownerMin: "+ ownerMin);
+				for(int i = 0; i< results.size(); i++){
+					Game cur = results.get(i);
+					if( ownerMin > cur.getOwners()){
+						System.out.println("owners: "+ cur.getOwners());
+						results.remove(i);
+					}
+				}
+			}
 		}
-		
+		this.maxPages = (results.size()/25);
+		if(results.size()% 25 > 0)
+			this.maxPages += 1;
 		this.searchResults = results;
 		getCurrentPage();
 		
@@ -193,13 +212,12 @@ public class GameSearchBean implements Serializable {
 			if( resultsPage == maxPages)
 				finish = start + searchResults.size() % 25;
 			
-			table += "<table class='table'><thead><tr class='filters'><th>#</th><th>Game Title</th><th>GameID</th><th>Genre</th><th>Owners</th></tr></thead><tbody>";
+			table += "<table class='table'><thead><tr class='filters'><th>#</th><th>Game Title</th><th>GameID</th><th>Owners</th></tr></thead><tbody>";
 			for(int i = start; i< finish; i++){
 				Game cur = searchResults.get(i);
 				table += "<tr><td>" + (i + 1) + "</td>";
 				table += "<td>" + cur.getName() + "</td>";
 				table += "<td>" + cur.getAppId() + "</td>";
-				table += "<td>" + cur.getGenre() + "</td>";
 				table += "<td>" + cur.getOwners() + "</td>";
 				table += "</tr>";
 			}
