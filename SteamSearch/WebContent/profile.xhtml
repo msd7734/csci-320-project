@@ -1,6 +1,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:p="http://primefaces.org/ui">
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core">
 <h:head>
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -15,62 +16,69 @@
 
 </h:head>
 <body>
-	<div class="whole-page">
-		<div class="content-body">
-			<h1>Steam Searcher</h1>
-			<div class="panel panel-default">
-				<div class="panel-body">
-					<ul class="nav nav-pills" role="tablist">
-						<li class="active"><h:link outcome="profile.xhtml" value="Profile"/></li>
-						<li><h:link outcome="Games.xhtml" value="Games"/></li>
-						<li><h:link outcome="Users.xhtml" value="Users"/></li>
-					</ul>
-					<hr />
-					<div class="tab">
-						<div class="row">
-							<h2>
-								<h:outputText value="#{profileBean.sessionBean.username}" />
-							</h2>
-							<h4>
-								<h:outputText value="Current Profile: #{profileBean.sessionBean.account.personaName}" />
-							</h4>
+	<h:form>
+		<div class="whole-page">
+			<div class="content-body">
+				<h1>Steam Searcher</h1>
+				<a href="http://steampowered.com" target="_blank">Powered By
+					Steam</a>
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<ul class="nav nav-pills" role="tablist">
+							<li class="active"><h:link outcome="profile.xhtml"
+									value="Profile" /></li>
+							<li><h:link outcome="Games.xhtml" value="Games" /></li>
+							<li><h:link outcome="Users.xhtml" value="Users" /></li>
+						</ul>
+						<hr />
+						<div class="tab">
+							<div class="row">
+								<h2>
+									<h:outputText value="#{profileBean.sessionBean.username}" />
+								</h2>
+								<h4>
+									<h:outputText
+										value="Current Profile: #{profileBean.sessionBean.account.personaName}" />
+								</h4>
 
-						</div>
-						<div class="row">
-							<div class="col-xs-12 col-sm-6 col-md-6">
-								<h4>Games</h4>
-								<p:dataTable var="game" value="#{profileBean.games}"
-									paginator="true" rows="10">
-									<p:column headerText="Name">
-										<h:outputText value="#{game.name}" />
-									</p:column>
-
-									<p:column headerText="Genre">
-										<h:outputText value="#{game.genre}" />
-									</p:column>
-
-									<p:column headerText="Playtime">
-										<h:outputText value="#{game.playTimeForever}" />
-									</p:column>
-
-								</p:dataTable>
 							</div>
-							<div class="col-xs-12 col-sm-6 col-md-6">
-								<h4>Friends</h4>
-								<p:dataList value="#{profileBean.friends}" var="friend"
-									type="unordered" itemType="none" paginator="true" rows="10"
-									styleClass="paginated">
-									<h:outputText value="#{friend.personaName}"
-										style="display:inline-block" />
-								</p:dataList>
+							<div class="row">
+								<div class="col-xs-12 col-sm-6 col-md-6">
+									<h4>Games</h4>
+									<p:dataTable var="game" value="#{profileBean.games}"
+										paginator="true" rows="10">
+										<p:column headerText="Name" sortBy="#{game.name}">
+											<h:outputText value="#{game.name}" />
+										</p:column>
+
+										<p:column headerText="Playtime Last 2 Weeks" sortBy="#{game.playTime2Weeks}">
+											<h:outputText value="#{game.playTime2WeeksFormatted}" />
+										</p:column>
+
+										<p:column headerText="Total Playtime" sortBy="#{game.playTimeForever}">
+											<h:outputText value="#{game.playTimeForeverFormatted}" />
+										</p:column>
+
+									</p:dataTable>
+								</div>
+								<div class="col-xs-12 col-sm-6 col-md-6">
+									<h4>Friends</h4>
+									
+
+									<p:dataTable value="#{profileBean.friends}" var="friend"
+										rows="10" paginator="true">
+										<p:column>
+											<h:outputText value="#{friend.personaName}" />
+										</p:column>
+									</p:dataTable>
+								</div>
 							</div>
 						</div>
+
 					</div>
-
 				</div>
 			</div>
 		</div>
-	</div>
-
+	</h:form>
 </body>
 </html>

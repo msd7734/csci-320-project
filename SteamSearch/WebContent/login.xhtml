@@ -21,13 +21,15 @@
 <body>
 	<div class="whole-page">
 		<div class="content-body">
-			<h1>Steam Searcher</h1>
-			<div class="panel panel-default">
-				<div class="panel-body">
-					<div class="tab">
+			<h:form>
+				<h1>Steam Searcher</h1>
+				<a href="http://steampowered.com" target="_blank">Powered By Steam</a>
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<div class="tab">
 
 
-						<h:form>
+
 							<div class="row">
 								<p:messages for="newUserMessages" severity="info" id="messages"
 									showDetail="false" autoUpdate="true" closable="true" />
@@ -60,7 +62,7 @@
 												</div>
 												<div class="row">
 													<h:commandButton styleClass="btn btn-sm btn-default"
-														value="Login" action="#{loginBean.login}">
+														value="Login" action="#{loginBean.login}" >
 														<f:param name="group1" value="1" />
 													</h:commandButton>
 												</div>
@@ -122,10 +124,11 @@
 									</div>
 								</div>
 							</div>
-						</h:form>
+
+						</div>
 					</div>
 				</div>
-			</div>
+			</h:form>
 		</div>
 	</div>
 </body>

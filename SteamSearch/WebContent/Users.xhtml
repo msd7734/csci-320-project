@@ -16,27 +16,32 @@
 
 </h:head>
 <body>
-	<div class="whole-page">
-		<div class="content-body">
-			<h1>Steam Searcher</h1>
-			<div class="panel panel-default">
-				<div class="panel-body">
-					<ul class="nav nav-pills" role="tablist">
-						<li><h:link outcome="profile.xhtml" value="Profile" /></li>
-						<li><h:link outcome="Games.xhtml" value="Games" /></li>
-						<li class="active"><h:link outcome="Users.xhtml"
-								value="Users" /></li>
-					</ul>
-					<hr />
-					<div class="tab">
-						<h2>User Search:</h2>
-						<div class="panel panel-default">
-							<div class="panel-body">
-								<form>
+	<h:form>
+		<div class="whole-page">
+			<div class="content-body">
+				<h1>Steam Searcher</h1>
+				<a href="http://steampowered.com" target="_blank">Powered By
+					Steam</a>
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<ul class="nav nav-pills" role="tablist">
+							<li><h:link outcome="profile.xhtml" value="Profile" /></li>
+							<li><h:link outcome="Games.xhtml" value="Games" /></li>
+							<li class="active"><h:link outcome="Users.xhtml"
+									value="Users" /></li>
+						</ul>
+						<hr />
+						<div class="tab">
+							<h2>User Search:</h2>
+							<p:messages for="userSearchMessages" severity="info" id="messages"
+									showDetail="false" autoUpdate="true" closable="true" />
+							<div class="panel panel-default">
+								<div class="panel-body">
+
 									<div class="row">
 										<div class="col-xs-12 col-sm-6 col-md-6">
 											<div class="form-group">
-												<p:outputLabel tabindex="2" for="idInput" value="Steam ID:"
+												<p:outputLabel for="idInput" value="Steam ID:"
 													styleClass="form-control input-lg" />
 												<h:inputText id="idInput" styleClass="form-control input-lg"
 													tabindex="1" value="#{userBean.steamId}" />
@@ -44,33 +49,41 @@
 										</div>
 										<div class="col-xs-12 col-sm-6 col-md-6">
 											<div class="form-group">
-												<p:outputLabel tabindex="2" for="genreMenu"
-													value="Genre Preference:"
-													styleClass="form-control input-lg" />
-												<p:selectOneMenu id="genreMenu" value="#{userBean.genre}"
-													style="width:250px">
-													<f:selectItems value="#{userBean.genres}" />
-												</p:selectOneMenu>
+												<p:outputLabel for="nameInput"
+													value="Username:" styleClass="form-control input-lg" />
+												<h:inputText id="nameInput"
+													styleClass="form-control input-lg" tabindex="2"
+													value="#{userBean.personaName}" />
 											</div>
 										</div>
 									</div>
 									<div class="row">
 										<div class="col-xs-12 col-sm-6 col-md-6">
 											<div class="form-group">
-												<p:outputLabel tabindex="2" for="gameInput"
+												<p:outputLabel for="gameInput"
 													value="Owned Game:" styleClass="form-control input-lg" />
 												<h:inputText id="gameInput"
 													styleClass="form-control input-lg" tabindex="3"
 													value="#{userBean.gameName}" />
 											</div>
-										</div>
+										</div>										
 										<div class="col-xs-12 col-sm-6 col-md-6">
 											<div class="form-group">
-												<p:outputLabel tabindex="2" for="nameInput"
-													value="Username:" styleClass="form-control input-lg" />
-												<h:inputText id="nameInput"
-													styleClass="form-control input-lg" tabindex="3"
-													value="#{userBean.gameName}" />
+												<p:outputLabel tabindex="2" for="dayInput" value="Days:"
+													styleClass="form-control input-sm" />
+												<h:inputText id="dayInput"
+													styleClass="form-control input-sm" tabindex="4"
+													value="#{userBean.days}" />
+												<p:outputLabel tabindex="2" for="hourInput" value="Hours:"
+													styleClass="form-control input-sm" />
+												<h:inputText id="hourInput"
+													styleClass="form-control input-sm" tabindex="5"
+													value="#{userBean.hours}" />
+												<p:outputLabel tabindex="2" for="minuteInput" value="Minutes:"
+													styleClass="form-control input-sm" />
+												<h:inputText id="minuteInput"
+													styleClass="form-control input-sm" tabindex="6"
+													value="#{userBean.minutes}" />
 											</div>
 										</div>
 									</div>
@@ -82,28 +95,36 @@
 												action="#{userBean.accountSearch}" update="userSearchTable" />
 										</div>
 									</div>
-								</form>
+
+								</div>
+							</div>
+							<div>
+								<h2>Search Results:</h2>
+								<p:dataTable var="account" value="#{userBean.accounts}"
+									rows="10" style="margin-bottom:40px" id="userSearchTable"
+									paginator="true" rowsPerPageTemplate="5,10,15,20">
+									<p:column headerText="Id" sortBy="#{account.steamId}">
+										<h:outputText value="#{account.steamId}" />
+									</p:column>
+
+									<p:column headerText="Name" sortBy="#{account.personaName}">
+										<h:outputText value="#{account.personaName}" />
+									</p:column>
+
+									<p:column headerText="Set as Active Account">
+										<h:commandButton
+											action="#{userBean.setActiveAccount(account.steamId)}"
+											value="Set" />
+									</p:column>
+
+								</p:dataTable>
 							</div>
 						</div>
-						<div>
-							<h2>Search Results:</h2>
-							<p:dataTable var="account" value="#{userBean.accounts}"
-								style="margin-bottom:40px" id="userSearchTable">
-								<p:column headerText="Id" sortBy="#{account.steamId}">
-									<h:outputText value="#{account.steamId}" />
-								</p:column>
 
-								<p:column headerText="Name" sortBy="#{account.personaName}">
-									<h:outputText value="#{account.personaName}" />
-								</p:column>
-							</p:dataTable>
-						</div>
 					</div>
-
 				</div>
 			</div>
 		</div>
-	</div>
-
+	</h:form>
 </body>
 </html>

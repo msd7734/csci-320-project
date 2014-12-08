@@ -6,6 +6,8 @@ public class GameCopy extends Game {
 	private String steamId;
 	private int playTime2Weeks;
 	private int playTimeForever;
+	private String playTime2WeeksFormatted;
+	private String playTimeForeverFormatted;
 	private Game game;
 
 	public GameCopy() {
@@ -16,9 +18,32 @@ public class GameCopy extends Game {
 			int playTimeForever) {
 		this.appId = appId;
 		this.steamId = steamId;
-		this.playTime2Weeks = playTime2Weeks;
-		this.playTimeForever= playTimeForever;
+		setPlayTime2Weeks(playTime2Weeks);
+		setPlayTimeForever(playTimeForever);
 
+	}
+	
+	
+	public String formatTime(int minutes) {
+		int mins = minutes%60;
+		int hours = minutes/60;
+		int days = hours/24;
+		hours = hours%24;
+		String formatted = "";
+		if(days != 0) {
+			formatted += (days + " Days ");
+		}
+		if(hours != 0) {
+			formatted += (hours + " Hours ");
+		}
+		if(mins != 0) {
+			formatted += (mins + " Minutes ");
+		}
+		if(formatted.isEmpty()) {
+			formatted = "None";
+		}
+		
+		return formatted;
 	}
 
 	/**
@@ -48,13 +73,14 @@ public class GameCopy extends Game {
 	 *            the playTime2Weeks to set
 	 */
 	public void setPlayTime2Weeks(int playTime2Weeks) {
+		setPlayTime2WeeksFormatted(formatTime(playTime2Weeks));
 		this.playTime2Weeks = playTime2Weeks;
 	}
 
 	/**
 	 * @return the playTimeForever
 	 */
-	public int getPlayTimeForever() {
+	public int getPlayTimeForever() {		
 		return playTimeForever;
 	}
 
@@ -63,6 +89,7 @@ public class GameCopy extends Game {
 	 *            the playTimeForever to set
 	 */
 	public void setPlayTimeForever(int playTimeForever) {
+		setPlayTimeForeverFormatted(formatTime(playTimeForever));
 		this.playTimeForever = playTimeForever;
 	}
 
@@ -93,6 +120,34 @@ public class GameCopy extends Game {
 	 */
 	public void setGame(Game game) {
 		this.game = game;
+	}
+
+	/**
+	 * @return the playTimeForeverFormatted
+	 */
+	public String getPlayTimeForeverFormatted() {
+		return playTimeForeverFormatted;
+	}
+
+	/**
+	 * @param playTimeForeverFormatted the playTimeForeverFormatted to set
+	 */
+	public void setPlayTimeForeverFormatted(String playTimeForeverFormatted) {
+		this.playTimeForeverFormatted = playTimeForeverFormatted;
+	}
+
+	/**
+	 * @return the playTime2WeeksFormatted
+	 */
+	public String getPlayTime2WeeksFormatted() {
+		return playTime2WeeksFormatted;
+	}
+
+	/**
+	 * @param playTime2WeeksFormatted the playTime2WeeksFormatted to set
+	 */
+	public void setPlayTime2WeeksFormatted(String playTime2WeeksFormatted) {
+		this.playTime2WeeksFormatted = playTime2WeeksFormatted;
 	}
 
 }

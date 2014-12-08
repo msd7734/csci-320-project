@@ -60,9 +60,24 @@ public class ProfileBean implements Serializable {
 		}
 	}
 	
+	
 	public String setActiveAccount(String steamid) {
+		try {
+				SteamAccount account = null;
+					account = accountService.getSteamAccount(steamid);
+					if (account != null) {
+						account.setFriends(friendService.getFriendList(steamid));
+						account.setGames(gamesService.getAccountGames(steamid));
+						friends = account.getFriends();
+						games = account.getGames();
+						//userService.updateSteamId(account.getPersonaName(), steamid);
+					}
+				sessionBean.setAccount(account);
+				return "profile.xhtml";
+			
+		} catch (SQLException e) {
 		
-		
+		}
 		return null;
 	}
 
