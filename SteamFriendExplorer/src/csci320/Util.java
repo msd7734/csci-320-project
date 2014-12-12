@@ -1,6 +1,19 @@
 package csci320;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class Util {
 	private static final String STEAM_ID = "(?i)steam_\\d:\\d:\\d{8}";
@@ -54,5 +67,32 @@ public abstract class Util {
 	public static <E> Set<E> concatSet(Set<E> s1, Set<E> s2) {
 		s1.addAll(s2);
 		return s1;
+	}
+	
+	public static <E> Set<E> trimSet(Set<E> s, int newSize) {
+		if (newSize > s.size())
+			return s;
+		else if (newSize < 1)
+			return new HashSet<E>();
+		
+		List listForm = Arrays.asList(s.toArray());
+		listForm = (List<E>) listForm;
+		listForm = listForm.subList(0, newSize);
+		return new HashSet<E>(listForm);
+	}
+	
+	public static void iterateResultSet(ResultSet r) throws SQLException {
+		ResultSetMetaData meta = r.getMetaData();
+		int columnCount = meta.getColumnCount();
+		String[] colLabels = new String[columnCount];
+		for (int i=0;i<columnCount;++i) {
+			colLabels[i] = meta.getColumnName(i+1);
+		}
+		while (r.next()) {
+			for (int i=0;i<columnCount;++i) {
+				System.out.print(colLabels[i] + " : " + r.getObject(i+1) + ",  ");
+			}
+			System.out.println();
+		}
 	}
 }

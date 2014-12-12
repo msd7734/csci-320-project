@@ -3,7 +3,11 @@ package csci320;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.sql.BatchUpdateException;
+import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Set;
@@ -141,6 +145,11 @@ public class SteamFriendExplorer {
 		String rootUserId = "NO ROOT USER";
 		int maxNodes = 1;
 		
+		String dbUser = "NO DB USER";
+		String dbPass = "NO DB PASS";
+		String dbHost = "NO DB HOST";
+		String dbPort = "NO DB PORT";
+		
 		try {
 			cfg.read();
 			if (cfg.getPropertyVal("apikey") != null)
@@ -154,13 +163,41 @@ public class SteamFriendExplorer {
 					System.out.println("The value \"maxnodes\" in the config was malformed (not an integer).");
 				}
 			}
+			if (cfg.getPropertyVal("dbuser") != null)
+				dbUser = cfg.getPropertyVal("dbuser");
+			if (cfg.getPropertyVal("dbpass") != null)
+				dbPass = cfg.getPropertyVal("dbpass");
+			if (cfg.getPropertyVal("host") != null)
+				dbHost = cfg.getPropertyVal("host");
+			if (cfg.getPropertyVal("port") != null) 
+				dbPort = cfg.getPropertyVal("port");
 			
 			SteamApi steamApi = new SteamApi(apiKey, Util.steamIdTo64Bit(rootUserId), maxNodes);
+			steamApi.setNotifyApiCalls(true);
+			
 			try {
-				steamApi.explore();
+				Set<SteamUserNode> data = steamApi.explore();
+				PostgresDB database = new PostgresDB(dbUser, dbPass, dbHost, dbPort);
+				System.out.println("Starting database operations...");
+				long time = - System.currentTimeMillis();
+				int affectedRows = database.persistGameData(steamApi.getKnownGames());
+				affectedRows += database.persistUserData(data);
+				time += System.currentTimeMillis();
+				System.out.println("Database operations completed in " + time + "ms");
+				System.out.println(affectedRows + " row(s) affected");
 			} catch (InaccessibleRootSteamUserException irsue) {
 				System.out.println("The steam profile given as the root was not accessible (is the profile private?)");
 				return;
+			} catch (BatchUpdateException bue) {
+				System.out.println(bue.getMessage());
+				bue.printStackTrace();
+				bue.getNextException().printStackTrace();
+			} catch (SQLException sqle) {
+				System.out.println(sqle.getMessage());
+				sqle.printStackTrace();
+			} catch (ClassNotFoundException cnfe) {
+				System.out.println(cnfe.getMessage());
+				cnfe.printStackTrace();
 			}
 		}
 		catch (FileNotFoundException fnfe) {
@@ -173,7 +210,35 @@ public class SteamFriendExplorer {
 			System.out.print(io.getMessage());
 			return;
 		}
-		
-		
+	}
+	
+	public static void printKnownGames(Set<SteamGame> games) {
+		System.out.println("Known games: ");
+		for (SteamGame g : games) {
+			System.out.println(" " + g.getId() + " : \"" + g.getName() + "\"");
+		}
+	}
+	
+	public static void printUserGames(SteamUserNode user) {
+		System.out.println(user.getPersonaName() + " owns:");
+		for (PlayedGame g : user.getPlayedGames()) {
+			System.out.println(" " + g.getName() + " (" + g.getPlayTimeForever() / 60 + " total hours played)");
+		}
+	}
+	
+	public static void printUserNodeResult(Set<SteamUserNode> data) {
+		for (SteamUserNode n : data) {
+			String playerVis = n.isVisible() ? " (a FULL node)" : " (an EMPTY node)";
+			System.out.println(n.getPersonaName() + playerVis + ": ");
+			System.out.println(
+				n.isVisible() ? " IS VISIBLE" : " NOT VISIBLE"
+			);
+			for (SteamUserNode f : n.getFriends()) {
+				if (f.isFullNode())
+					System.out.println(" Populated friend node: " + f.getPersonaName());
+				else
+					System.out.println(" Empty friend node: " + f.getId());
+			}
+		}
 	}
 }

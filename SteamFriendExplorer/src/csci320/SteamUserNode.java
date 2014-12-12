@@ -2,10 +2,12 @@ package csci320;
 
 import java.util.Set;
 import java.util.HashSet;
+
 import org.json.*;
 
 public class SteamUserNode {
 	long id;
+	//names should be in unicode
 	String personaName;
 	String profileUrl;
 	String avatar;
@@ -13,11 +15,22 @@ public class SteamUserNode {
 	String avatarFull;
 	ProfileVisibility visibility;
 	Set<SteamUserNode> friends;
+	Set<PlayedGame> games;
 	
-	public SteamUserNode() { }
+	//is this node empty/just an id? Or does it have full player info?
+	boolean isFullNode;
+	
+	public SteamUserNode() { 
+		this.friends = new HashSet<SteamUserNode>();
+		this.games = new HashSet<PlayedGame>();
+		this.isFullNode = false;
+	}
 	
 	public SteamUserNode(long id) {
 		this.id = id;
+		this.friends = new HashSet<SteamUserNode>();
+		this.games = new HashSet<PlayedGame>();
+		this.isFullNode = false;
 	}
 	
 	public SteamUserNode(long id, String personaName, String profileUrl,
@@ -30,6 +43,9 @@ public class SteamUserNode {
 		this.avatarMed = avatarMed;
 		this.avatarFull = avatarFull;
 		this.visibility = visibility;
+		this.friends = new HashSet<SteamUserNode>();
+		this.games = new HashSet<PlayedGame>();
+		this.isFullNode = true;
 	}
 
 	public static Set<SteamUserNode> getFromJSON(String json, boolean ignoreHidden) {
@@ -40,10 +56,12 @@ public class SteamUserNode {
 			JSONArray players = new JSONObject(json).getJSONObject("response").getJSONArray("players");
 			for (int i=0; i<players.length(); ++i) {
 				JSONObject p = players.getJSONObject(i);
-				if (ignoreHidden &&
+				if (!ignoreHidden || (ignoreHidden &&
 						p.getInt("communityvisibilitystate") !=
-						ProfileVisibility.hidden.getValue()) {
+						ProfileVisibility.hidden.getValue())) {
 					
+					//note that this is all public data we're getting
+					//private would only be ignored because we can't see friends of private profiles
 					res.add(new SteamUserNode(
 							p.getLong("steamid"),
 							p.getString("personaname"),
@@ -67,29 +85,57 @@ public class SteamUserNode {
 		return res;
 	}
 	
-	public void addFriendsFromJSON(String json) {
-		//JSONArray friends = new JSONObject(json).getJSONObject("response").getJSONArray("players");
-	}
-	
 	public void addFriend(SteamUserNode n) {
 		friends.add(n);
+	}
+	
+	public void addPlayedGame(PlayedGame g) {
+		games.add(g);
 	}
 	
 	public long getId() {
 		return id;
 	}
 	
-	public boolean isPublic() {
+	public String getPersonaName() {
+		return personaName;
+	}
+	
+	public boolean isVisible() {
 		return (visibility.getValue() == 3);
 	}
 	
+	public Set<SteamUserNode> getFriends() {
+		return friends;
+	}
+	
+	public Set<PlayedGame> getPlayedGames() {
+		return games;
+	}
+	
+	public boolean isFullNode() {
+		return isFullNode;
+	}
+	
 	@Override
-	public boolean equals(Object o) {
-		if (o instanceof SteamUserNode) {
-			SteamUserNode other = (SteamUserNode) o;
-			return (this.id == other.getId());
-		}
-		else
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
 			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SteamUserNode other = (SteamUserNode) obj;
+		if (id != other.id)
+			return false;
+		return true;
 	}
 }
