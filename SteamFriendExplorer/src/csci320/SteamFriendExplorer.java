@@ -17,8 +17,12 @@ public class SteamFriendExplorer {
 		int pathArg = -1;
 		int decryptArg = -1;
 		int modConfigArg = -1;
+		int localSaveArg = -1;
 		String cfgPathStr = "config";
 		boolean decrypt = true;
+		boolean fileSave = false;
+		String savePathStr = "NO SAVE PATH";
+		URI savePath = null;
 		
 		//process args
 		for (int i = 0; i < args.length; ++i) {
@@ -34,6 +38,10 @@ public class SteamFriendExplorer {
 				case "-c":
 				case "-configmod":
 					modConfigArg = i;
+					break;
+				case "-f":
+				case "-savetofile":
+					localSaveArg = i;
 					break;
 			}
 		}
@@ -102,6 +110,27 @@ public class SteamFriendExplorer {
 			}
 			finally {
 				sc.close();
+			}
+		}
+		
+		if (localSaveArg > -1) {
+			fileSave = true;
+			int nextArg = localSaveArg + 1;
+			if (!(nextArg == pathArg || nextArg == decryptArg || nextArg == modConfigArg)) {
+				savePathStr = args[nextArg];
+				//allow quoting for paths with spaces
+				savePathStr.replaceAll("[\'\"]", "");
+				try {
+					savePath = new URI(savePathStr);
+				} catch (URISyntaxException urise) {
+					System.out.println("The supplied file save path " + savePathStr
+							+ " was malformed. If no path is provided,"
+							+ " files will be saved to this program's current directory.");
+					return;
+				}
+			}
+			else {
+				savePath = URI.create("");
 			}
 		}
 
