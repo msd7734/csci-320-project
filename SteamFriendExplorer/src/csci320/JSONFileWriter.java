@@ -102,7 +102,6 @@ public class JSONFileWriter {
 				JSONObject generalGame = new JSONObject(g.toString());
 				generalGame.remove("playtime_forever");
 				generalGame.remove("playtime_2weeks");
-				System.out.println(generalGame.getString("name"));
 				allGames.put(generalGame);
 			}
 		}
