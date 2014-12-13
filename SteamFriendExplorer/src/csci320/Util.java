@@ -21,6 +21,8 @@ public abstract class Util {
 	
 	private static final long ACCT_TYPE_IDENT = 0x0110000100000000L;	
 	
+	final static int[] illegalChars = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 34, 42, 47, 58, 60, 62, 63, 92, 124};
+	
 	public static void testSteamId(String idStr) {
 		System.out.println("Testing " + idStr);
 		if (idStr.matches(STEAM_ID))
@@ -94,5 +96,15 @@ public abstract class Util {
 			}
 			System.out.println();
 		}
+	}
+	
+	public static String cleanFileName(String fileName) {
+		String clean = "";
+		for (int i=0;i<fileName.length();++i) {
+			char c = fileName.charAt(i);
+			if (Arrays.binarySearch(illegalChars, c) < 0)
+				clean += c;
+		}
+		return clean;
 	}
 }

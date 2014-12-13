@@ -9,8 +9,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -120,10 +122,8 @@ public class SteamFriendExplorer {
 		if (localSaveArg > -1) {
 			fileSave = true;
 			int nextArg = localSaveArg + 1;
-			if (!(nextArg == pathArg || nextArg == decryptArg || nextArg == modConfigArg)) {
+			if (!(nextArg == (pathArg - 1) || nextArg == decryptArg || nextArg == modConfigArg)) {
 				savePathStr = args[nextArg];
-				//allow quoting for paths with spaces
-				savePathStr.replaceAll("[\'\"]", "");
 				try {
 					savePath = new URI(savePathStr);
 				} catch (URISyntaxException urise) {
@@ -172,6 +172,20 @@ public class SteamFriendExplorer {
 			if (cfg.getPropertyVal("port") != null) 
 				dbPort = cfg.getPropertyVal("port");
 			
+			if (!fileSave) {
+				String missing[] = new String[] { 
+					dbUser.equals("NO DB USER") ? "dbuser" : "",
+					dbPass.equals("NO DB PASS") ? "dbpass" : "",
+					dbHost.equals("NO DB HOST") ? "dbhost" : "",
+					dbPort.equals("NO DB PORT") ? "dbport" : ""
+				};
+				missing = Arrays.stream(missing).filter(x -> !x.equals("")).toArray(size -> new String[size]);
+				if (missing.length > 0) {
+					System.out.println("Connection to a remote database will not be possible due to the following missing config values:");
+					System.out.println(Arrays.stream(missing).collect(Collectors.joining(", ")));
+					return;
+				}
+			}
 			SteamApi steamApi = new SteamApi(apiKey, Util.steamIdTo64Bit(rootUserId), maxNodes);
 			steamApi.setNotifyApiCalls(true);
 			

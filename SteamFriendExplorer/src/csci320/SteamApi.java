@@ -28,6 +28,9 @@ public class SteamApi {
 	private int apiCalls;
 	private boolean notifyApiCalls;
 	
+	private boolean localWrite;
+	private JSONFileWriter jsonWriter;
+	
 	public SteamApi(String key, long rootUserId, int maxNodes) {
 		this.key = key;
 		this.rootUserNode = new SteamUserNode(rootUserId);
@@ -36,6 +39,8 @@ public class SteamApi {
 		this.knownGames = new HashSet<SteamGame>();
 		this.notifyApiCalls = false;
 		this.apiCalls = 0;
+		this.localWrite = false;
+		this.jsonWriter = null;
 	}
 	
 	public Set<SteamGame> getKnownGames() {
@@ -44,6 +49,11 @@ public class SteamApi {
 	
 	public void setNotifyApiCalls(boolean notify) {
 		notifyApiCalls = notify;
+	}
+	
+	public void setFileWriter(JSONFileWriter writer) {
+		this.localWrite = true;
+		this.jsonWriter = writer;
 	}
 	
 	public Set<SteamUserNode> explore() throws InaccessibleRootSteamUserException {
@@ -153,6 +163,9 @@ public class SteamApi {
 				response = reader.lines().collect(Collectors.joining());
 				res = SteamUserNode.getFromJSON(response, true);
 				this.visitedUsers = Util.concatSet(this.visitedUsers, res);
+				if (localWrite) {
+					jsonWriter.writePlayerSummary(response);
+				}
 			}
 			
 		} catch (JSONException jse) {
@@ -192,6 +205,10 @@ public class SteamApi {
 					//don't add the friend if it's already been visited
 					if (!visitedUsers.contains(new SteamUserNode(id)))
 						res.add(id);
+				}
+				
+				if (localWrite) {
+					jsonWriter.writeFriendIds(response, player);
 				}
 			}
 			
@@ -242,6 +259,10 @@ public class SteamApi {
 							
 							if (!knownGames.contains(game)) {
 								knownGames.add((SteamGame) game);
+							}
+							
+							if (localWrite) {
+								jsonWriter.writeOwnedGames(response, p);
 							}
 						}
 					}
