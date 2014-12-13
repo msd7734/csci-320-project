@@ -70,6 +70,12 @@ public class SteamApi {
 		if (result.size() == 0)
 			throw new InaccessibleRootSteamUserException();
 		
+		try {
+			jsonWriter.writeAllGames();
+		} catch (IOException ioe) {
+			System.out.println("Warning: Failed writing local \"games.json\" file.");
+		}
+		
 		if (notifyApiCalls)
 			System.out.println("Total API calls made: " + apiCalls);
 		

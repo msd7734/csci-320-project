@@ -1,30 +1,37 @@
 package csci320;
 
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.json.*;
 
 public class JSONFileWriter {
 	
-	private static final String SUMMARY_FNAME = "player" + File.pathSeparator + "%1$s" + File.pathSeparator + "%1$s.json";
-	private static final String FRIENDS_FNAME = "player" + File.pathSeparator + "%s" + File.pathSeparator + "friends.json";
-	private static final String OWNED_FNAME = "player" + File.pathSeparator + "%s" + File.pathSeparator + "ownedgames.json";
-	private static final String GAMES_FNAME = "game" + File.pathSeparator + "games.json";
+	private static final String SUMMARY_FNAME = "player" + File.separator + "%1$s" + File.separator + "%1$s.json";
+	private static final String FRIENDS_FNAME = "player" + File.separator + "%s" + File.separator + "friends.json";
+	private static final String OWNED_FNAME = "player" + File.separator + "%s" + File.separator + "ownedgames.json";
+	private static final String GAMES_FNAME = "game" + File.separator + "games.json";
 	
-	private URI path;
-	private JSONObject allGames;
+	private Path path;
+	private JSONArray allGames;
 	
 	private Set<Long> knownPlayerIds;
+	private Set<Long> knownGameIds;
 	
-	public JSONFileWriter(URI path) {
+	public JSONFileWriter(Path path) {
 		this.path = path;
-		this.allGames = new JSONObject();
+		this.allGames = new JSONArray("[ ]");
 		this.knownPlayerIds = new HashSet<Long>();
+		this.knownGameIds = new HashSet<Long>();
 	}
 	
 	//write methods should map 1-1 with SteamApi methods that make API calls
@@ -55,12 +62,12 @@ public class JSONFileWriter {
 				knownPlayerIds.add(id);
 				String username = p.getString("personaname");
 				String cleanUsername = Util.cleanFileName(username);
-				FileOutputStream out = getOutputStream(String.format(SUMMARY_FNAME, cleanUsername));
+				Writer out = getOutputWriter(String.format(SUMMARY_FNAME, cleanUsername));
 				
 				if (null == out)
 					return;
 				
-				out.write(p.toString(4).getBytes());
+				out.write(p.toString(4));
 				out.flush();
 				out.close();
 			}
@@ -70,50 +77,67 @@ public class JSONFileWriter {
 	public void writeFriendIds(String json, SteamUserNode user) throws IOException {
 		JSONObject friendsList = new JSONObject(json).getJSONObject("friendslist");
 		String cleanUsername = Util.cleanFileName(user.getPersonaName());
-		FileOutputStream out = getOutputStream(String.format(FRIENDS_FNAME, cleanUsername));
+		Writer out = getOutputWriter(String.format(FRIENDS_FNAME, cleanUsername));
 		
 		if (null == out)
 			return;
 		
-		out.write(friendsList.toString(4).getBytes());
+		out.write(friendsList.toString(4));
 		out.flush();
 		out.close();
 	}
 	
-	public void writeOwnedGames(String json, SteamUserNode user) {
+	public void writeOwnedGames(String json, SteamUserNode user) throws IOException {
 		//this is going to do something tricky:
 		//save all the games, then concat the json into one file for all games
 		//this is so SteamApi doesn't have to change to save all that JSON
 		
-		
-		
-		return;
-	}
-	
-	public void writeAllGames() {
-		//stub
-	}
-	
-	
-	private FileOutputStream getOutputStream(String fileName) {
-		try {
-			File f = new File(path.resolve("json" + File.pathSeparator + fileName));
-			if (!f.exists()) {
-				if (f.isDirectory())
-					f.mkdirs();
-				else if (f.isFile()) {
-					f.getParentFile().mkdirs();
-					f.createNewFile();
-				}
-				else {
-					//this is dumb but whatever, cover our bases, be explicit, etc.
-					throw new Exception("Somehow the file name " + fileName + " was neither a file nor directory.");
-				}
+		JSONObject playedGames = new JSONObject(json).getJSONObject("response");
+		JSONArray games = playedGames.getJSONArray("games");
+		for (int i=0;i<games.length();++i) {
+			JSONObject g = games.getJSONObject(i);
+			long id = g.getLong("appid");
+			if (!knownGameIds.contains(id)) {
+				knownGameIds.add(id);
+				JSONObject generalGame = new JSONObject(g.toString());
+				generalGame.remove("playtime_forever");
+				generalGame.remove("playtime_2weeks");
+				System.out.println(generalGame.getString("name"));
+				allGames.put(generalGame);
 			}
-			
-			FileOutputStream stream = new FileOutputStream(f);
-			return stream;
-			
+		}
+		
+		String cleanUsername = Util.cleanFileName(user.getPersonaName());
+		Writer out = getOutputWriter(String.format(OWNED_FNAME, cleanUsername));
+		
+		if (null == out)
+			return;
+		
+		out.write(playedGames.toString(4));
+		out.flush();
+		out.close();
+	}
+	
+	public void writeAllGames() throws IOException {
+		Writer out = getOutputWriter(GAMES_FNAME);
+		
+		if (null == out)
+			return;
+		
+		out.write(allGames.toString(4));
+		out.flush();
+		out.close();
+	}
+	
+	
+	private Writer getOutputWriter(String fileName) {
+		try {
+			File f = new File(path.resolve("json" + File.separator + fileName).toString());
+			if (!f.exists()) {
+				f.getParentFile().mkdirs();
+				f.createNewFile();
+			}	
+			return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f)));
 		} catch (Exception e) {
 			System.out.println("There was an error when writing local files.");
 			System.out.println(e.getMessage());

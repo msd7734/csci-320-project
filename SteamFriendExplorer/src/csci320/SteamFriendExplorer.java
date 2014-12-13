@@ -16,6 +16,9 @@ import java.util.stream.Collectors;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class SteamFriendExplorer {
 	
@@ -27,8 +30,10 @@ public class SteamFriendExplorer {
 		String cfgPathStr = "config";
 		boolean decrypt = true;
 		boolean fileSave = false;
+		boolean connectRemote = true;
 		String savePathStr = "NO SAVE PATH";
-		URI savePath = null;
+		//TODO: think about refacotring this to Path, URI spec doesn't like Windows slashes \
+		Path savePath = null;
 		
 		//process args
 		for (int i = 0; i < args.length; ++i) {
@@ -125,16 +130,17 @@ public class SteamFriendExplorer {
 			if (!(nextArg == (pathArg - 1) || nextArg == decryptArg || nextArg == modConfigArg)) {
 				savePathStr = args[nextArg];
 				try {
-					savePath = new URI(savePathStr);
-				} catch (URISyntaxException urise) {
+					savePath = Paths.get(savePathStr);
+				} catch (InvalidPathException ipe) {
 					System.out.println("The supplied file save path " + savePathStr
 							+ " was malformed. If no path is provided,"
 							+ " files will be saved to this program's current directory.");
+					System.out.println(ipe.getMessage());
 					return;
 				}
 			}
 			else {
-				savePath = URI.create("");
+				savePath = Paths.get("");
 			}
 		}
 
@@ -172,47 +178,58 @@ public class SteamFriendExplorer {
 			if (cfg.getPropertyVal("port") != null) 
 				dbPort = cfg.getPropertyVal("port");
 			
-			if (!fileSave) {
-				String missing[] = new String[] { 
-					dbUser.equals("NO DB USER") ? "dbuser" : "",
-					dbPass.equals("NO DB PASS") ? "dbpass" : "",
-					dbHost.equals("NO DB HOST") ? "dbhost" : "",
-					dbPort.equals("NO DB PORT") ? "dbport" : ""
-				};
-				missing = Arrays.stream(missing).filter(x -> !x.equals("")).toArray(size -> new String[size]);
-				if (missing.length > 0) {
-					System.out.println("Connection to a remote database will not be possible due to the following missing config values:");
-					System.out.println(Arrays.stream(missing).collect(Collectors.joining(", ")));
-					return;
-				}
+			String missing[] = new String[] { 
+				dbUser.equals("NO DB USER") ? "dbuser" : "",
+				dbPass.equals("NO DB PASS") ? "dbpass" : "",
+				dbHost.equals("NO DB HOST") ? "dbhost" : "",
+				dbPort.equals("NO DB PORT") ? "dbport" : ""
+			};
+			missing = Arrays.stream(missing).filter(x -> !x.equals("")).toArray(size -> new String[size]);
+			if (missing.length > 0) {
+				System.out.println("Connection to a remote database will not be attempted due to the following missing config values:");
+				System.out.println(Arrays.stream(missing).collect(Collectors.joining(", ")));
+				connectRemote = false;
 			}
+			
 			SteamApi steamApi = new SteamApi(apiKey, Util.steamIdTo64Bit(rootUserId), maxNodes);
 			steamApi.setNotifyApiCalls(true);
 			
+			if (fileSave)
+				steamApi.setFileWriter(new JSONFileWriter(savePath));
+			
+			Set<SteamUserNode> data = null;
+			
 			try {
-				Set<SteamUserNode> data = steamApi.explore();
-				PostgresDB database = new PostgresDB(dbUser, dbPass, dbHost, dbPort);
-				System.out.println("Starting database operations...");
-				long time = - System.currentTimeMillis();
-				int affectedRows = database.persistGameData(steamApi.getKnownGames());
-				affectedRows += database.persistUserData(data);
-				time += System.currentTimeMillis();
-				System.out.println("Database operations completed in " + time + "ms");
-				System.out.println(affectedRows + " row(s) affected");
+				data = steamApi.explore();
 			} catch (InaccessibleRootSteamUserException irsue) {
 				System.out.println("The steam profile given as the root was not accessible (is the profile private?)");
 				return;
-			} catch (BatchUpdateException bue) {
-				System.out.println(bue.getMessage());
-				bue.printStackTrace();
-				bue.getNextException().printStackTrace();
-			} catch (SQLException sqle) {
-				System.out.println(sqle.getMessage());
-				sqle.printStackTrace();
-			} catch (ClassNotFoundException cnfe) {
-				System.out.println(cnfe.getMessage());
-				cnfe.printStackTrace();
 			}
+			
+			//we have all config values we need, so we can try and connect to the database
+			if (connectRemote) {
+				try {
+					PostgresDB database = new PostgresDB(dbUser, dbPass, dbHost, dbPort);
+					System.out.println("Starting database operations...");
+					long time = - System.currentTimeMillis();
+					int affectedRows = database.persistGameData(steamApi.getKnownGames());
+					affectedRows += database.persistUserData(data);
+					time += System.currentTimeMillis();
+					System.out.println("Database operations completed in " + time + "ms");
+					System.out.println(affectedRows + " row(s) affected");
+				} catch (BatchUpdateException bue) {
+					System.out.println(bue.getMessage());
+					bue.printStackTrace();
+					bue.getNextException().printStackTrace();
+				} catch (SQLException sqle) {
+					System.out.println(sqle.getMessage());
+					sqle.printStackTrace();
+				} catch (ClassNotFoundException cnfe) {
+					System.out.println(cnfe.getMessage());
+					cnfe.printStackTrace();
+				}
+			}
+			
 		}
 		catch (FileNotFoundException fnfe) {
 			System.out.println("No \"config\" file was found in the current directory."
