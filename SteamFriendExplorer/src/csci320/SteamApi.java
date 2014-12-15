@@ -160,6 +160,7 @@ public class SteamApi {
 			URL url = new URL(query);
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
+			con.setConnectTimeout(3000);
 			con.connect();
 			int respCode = con.getResponseCode();
 			if (respCode != 200)
@@ -197,6 +198,7 @@ public class SteamApi {
 			URL url = new URL(query);
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
+			con.setConnectTimeout(3000);
 			con.connect();
 			int respCode = con.getResponseCode();
 			if (respCode != 200)
@@ -243,6 +245,7 @@ public class SteamApi {
 				URL url = new URL(query);
 				HttpURLConnection con = (HttpURLConnection) url.openConnection();
 				con.setRequestMethod("GET");
+				con.setConnectTimeout(3000);
 				con.connect();
 				int respCode = con.getResponseCode();
 				if (respCode != 200)
@@ -266,10 +269,10 @@ public class SteamApi {
 							if (!knownGames.contains(game)) {
 								knownGames.add((SteamGame) game);
 							}
-							
-							if (localWrite) {
-								jsonWriter.writeOwnedGames(response, p);
-							}
+						}
+						
+						if (localWrite) {
+							jsonWriter.writeOwnedGames(response, p);
 						}
 					}
 				}
